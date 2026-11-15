@@ -1,81 +1,70 @@
-# Un despliegue debe arrancar todos los servicios
+# Updates, backups and recovery
 
-En Dokploy se usa **General -> Deploy** para ejecutar el Compose completo.
-Reiniciar un contenedor desde Containers solo actúa sobre ese contenedor; no
-reanuda la operación Compose que había abortado por una dependencia unhealthy.
-Los reinicios individuales sugeridos durante el diagnóstico eran recuperación
-puntual, no el procedimiento normal después de cada push.
+[English](redeploy.md) · [Español](redeploy.es.md) · [Documentation](README.md)
 
-`docker compose up -d --build` puede conservar contenedores que no necesitan
-recrearse. Por eso una antigüedad de varias horas no demuestra duplicados.
-`restart: always` reinicia procesos que terminan, pero no procesos que siguen
-vivos con estado unhealthy.
+## Preserve the deployment identity
 
-## Reaplicar un checkout nuevo de Dokploy
+Use the existing application, Compose project name, credentials and persistent volumes. The volumes are named from `COMPOSE_PROJECT_NAME`, with `wand` as the fallback.
 
-Todos los bind mounts de fuentes, medios y plantillas usan ahora
-`create_host_path: false`. Así un contenedor que se reinicie durante la
-reclonación no crea carpetas como `vanilla-media` o `houdini` antes de que Git
-las clone. Los archivos de entrada son de solo lectura cuando no necesitan
-generarse dentro del contenedor. `www/.gitkeep` mantiene el montaje web opcional
-presente en un checkout nuevo.
+| Storage | Preserve |
+| --- | --- |
+| PostgreSQL | Database backup and existing `postgres_data` binding |
+| Redis | Existing `redis_data` binding and persistence policy |
+| World manager | Entire `world_data` volume: SQLite database and `assets/` |
+| Configuration | Environment values, selected branch, domains and Compose project arguments |
 
-Para recuperar una instalación cuyos contenedores aún tienen los montajes
-antiguos, detener **una vez** la aplicación desde General -> Stop antes de
-Deploy. Mantener Auto Deploy desactivado durante esa recuperación y cancelar
-despliegues en cola. No borrar la aplicación ni sus volúmenes. El comando
-personalizado solo se ejecuta después del clon, por lo que `--force-recreate`
-no puede corregir por sí solo un fallo de Git anterior a Compose.
+Take a consistent database/world-state backup before changes. Do not run `down -v`, select Fresh Volumes or delete the application as an update procedure.
 
-Los backends de Wand montan sus fuentes desde el host. Cuando Dokploy vuelve a
-clonar el directorio, un contenedor reutilizado puede seguir ligado al montaje
-anterior. Tras asegurar la persistencia fuera de `code/`, configura **una vez**
-en Advanced -> Command el comando Compose predeterminado que muestra Dokploy,
-añadiendo `--force-recreate --wait --wait-timeout 180` al final de `up`.
-Conserva su nombre de proyecto, `--env-file` y el archivo Compose seleccionado.
-El campo Command ya lleva `docker` delante; empieza por `compose`, sin scripts
-shell. Todos los despliegues posteriores usan ese ajuste automáticamente.
+## Migration from older bind mounts
 
-`--force-recreate` es una opción de la operación de despliegue, no una propiedad
-que se pueda forzar desde el YAML. Recrea contenedores, no borra sus datos
-persistentes. **No resuelve que el propio checkout contenga los datos:** si los
-montajes aún son `./.data` o `./.redis`, hay que preservarlos fuera antes.
+Older configurations stored PostgreSQL and Redis in `./.data` and `./.redis`. The current configuration uses named volumes outside the checkout.
 
-## Cambios de coordinación
+Changing the Compose file does not copy those directories into the new volumes. An installation with accounts/progress to preserve needs a separate backup and migration with the relevant services stopped. Retain the old data until the migrated installation is verified.
 
-- Login espera PostgreSQL y Redis healthy y declara `depends_on.restart: true`.
-- Los cuatro mundos esperan DB, Redis y login healthy y se reinician cuando
-  Compose actualiza o reinicia explícitamente esas dependencias.
-- Dash y Snowflake esperan DB/Redis healthy y reciben la misma propagación.
-- Web depende explícitamente de Dash y del proxy; se reinicia cuando Compose
-  actualiza esos servicios para resolver otra vez sus direcciones internas.
-- Login y mundos deben responder `apiOK` a una comprobación de versión del
-  protocolo antes de marcarse healthy. Houdini abre el puerto TCP antes de
-  terminar su arranque, por lo que un socket abierto por sí solo no basta.
+Changing back to older code must not accidentally restore checkout-relative data mounts.
 
-Esto se aplica a operaciones coordinadas de Compose. No convierte el estado
-unhealthy en un reinicio automático de Docker, no sustituye la recuperación de
-datos y no oculta fallos de credenciales, redes o almacenamiento.
+## Routine update
 
-## Persistencia antes de desplegar
+1. Review the changes and known compatibility limits.
+2. Back up data and record the existing project/volume configuration.
+3. Fetch the intended branch and initialize its pinned submodules.
+4. Validate the chosen Compose configuration.
+5. Build and recreate the complete stack using the same project/environment.
+6. Check health, account access, world entry, manager state and player presence.
 
-Conserva el nombre del proyecto y usa `docker-compose.dokploy.yml`. Ambos
-archivos Compose usan ahora volúmenes Docker persistentes para PostgreSQL y
-Redis fuera del checkout Git. El cambio desde `./.data` y `./.redis` inicia una
-instalación nueva: se ha autorizado para esta instalación de prueba sin datos
-importantes. Una instalación con cuentas que conservar requiere backup y
-migración previa; no hay migración automática ni eliminación de datos antiguos.
-Ver [guía Dokploy](ruffle.md).
+For a directly managed checkout using the direct-access override:
 
-## Prueba de integración
+~~~sh
+git pull --ff-only
+git submodule update --init --recursive
+docker compose -f docker-compose.yml -f docker-compose.direct.yml config --quiet
+docker compose -f docker-compose.yml -f docker-compose.direct.yml up -d --build --force-recreate --wait --wait-timeout 180
+~~~
 
-`tests/check-backend-startup.py` crea un proyecto Docker único con PostgreSQL y
-Redis sobre tmpfs y los cinco Houdini reales. No monta los datos del proyecto
-ni publica puertos. Comprueba el arranque en frío, reemplaza la DB de prueba
-para verificar la propagación de reinicios y ejecuta un único `up` después de
-detener los mundos. Las fuentes y SQL son los commits fijados del repositorio.
+These commands recreate services and can interrupt active sessions. Use only the Compose files selected for that installation; do not add direct ports to a Dokploy deployment.
 
-La prueba se ejecuta en el job backend de GitHub Actions. No valida el estado
-de las redes, rutas persistentes ni copias de seguridad del servidor real.
+## Dokploy checkout replacement
 
-Referencia: [orden de arranque y restart de dependencias en Compose](https://docs.docker.com/compose/how-tos/startup-order/).
+The backends bind-mount source code. If Dokploy replaces the checkout, reused containers can remain attached to the previous source mount.
+
+After confirming persistence outside the checkout, use Dokploy's normal Compose command with `--force-recreate --wait --wait-timeout 180` added to the `up` arguments. Keep its project name, env-file and Compose path. The Command field supplies Docker arguments, not an arbitrary shell hook.
+
+For containers created with the older mount definitions, stop the application once before recloning/deploying. Disable Auto Deploy and cancel queued deployments during that recovery. Do not delete the application or volumes.
+
+Current source mounts use `create_host_path: false` so Docker fails on missing source directories instead of creating directories that obstruct submodule cloning. A post-clone Compose command cannot repair a clone failure that occurred earlier.
+
+## Startup and recovery behavior
+
+Login waits for PostgreSQL/Redis health. Worlds also wait for login. Dash, Snowflake, web and their dependencies are coordinated in Compose. Houdini health checks require an `apiOK` protocol response.
+
+`depends_on.restart: true` propagates explicit Compose updates/restarts. `restart: always` restarts terminated processes, not live processes that merely become unhealthy.
+
+Use **General → Deploy** to run the whole Dokploy operation. Restarting one container does not resume an aborted Compose deployment. Inspect logs and the dependency that failed before retrying.
+
+## Rollback and branches
+
+Record the previous code revision before updating. Roll back code using the same project and retained volume bindings; verify that the old application can read current state. Selecting `flash` only changes client embedding and does not revert storage.
+
+`master` is the integration branch. Keep `feature/ruffle-support` if the test server deploys from it. A merge does not change Dokploy's selected branch; later integration commits do not automatically enter that branch.
+
+See [deployment](ruffle.md) and [validation](validation.md).
