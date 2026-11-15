@@ -58,8 +58,9 @@ all 685 rules work in Ruffle.
 
 ### Iron Man actions added by this fork
 
-This fork now adds two visual actions for the exact Iron Man outfit: cowl
-`1412`, bodysuit `4621`, and empty face, neck, hand and feet slots. Press **D**
+This fork adds flight and repulsors to Iron Man: cowl `1412` and bodysuit
+`4621`. Accessories are allowed; a recognized hand weapon takes priority for
+throwing, while the suit keeps its dance effect. Press **D**
 or choose Dance to hover with boot thrusters. Move to land. Press **T** and
 click a target to fire a repulsor instead of a snowball. Changing clothing or
 transforming also ends the flight.
@@ -85,6 +86,78 @@ Use FFDec 26.3.0. The builder rejects an unreviewed upstream base SWF and record
 source/compiler/output hashes in `world_manager/client/build.json`. Commit the
 source, generated SWF and build record together. No compilation is needed to
 equip the outfit, dance, shoot or change rooms.
+
+<!-- abilities:start -->
+### Expanded ability catalogue
+
+This expansion enables **47 equipment profiles using 63 item IDs**. The table
+lists the required pieces; other accessories are allowed. Redemption item IDs
+are normalized as in the original client (for example Olaf `34174` matches
+`24174`). No inventory items are granted and no event activation is required.
+
+Press **D** for the dance effect, move to stop, and use **T + click** to throw.
+**Existing native dances take priority** over the listed fallback. Costume
+abilities take dance priority when paired with a supported weapon; that weapon
+takes throw priority. These additions are new synchronized **visual effects**,
+not restored original party scripts: they do not cause damage, freeze another
+player, teleport the player, build furniture, or grant rewards.
+
+The 685 original outfit/action rules remain in use. Native transformations and
+ordinary clothing outside this catalogue keep their existing behavior. Profiles
+live in `world_manager/client/costume-profiles.json`; the builder validates item
+types and sprite availability. Rendering is in `ability-renderers.as` and both
+source files plus the profile data are covered by the compiled build hashes.
+
+| Equipped item or set | Required IDs | D fallback | T + click |
+| --- | --- | --- | --- |
+| Iron Man | head `1412`, body `4621` | Flight with thrusters | Repulsor |
+| Iron Patriot | head `1574`, body `4828` | Flight with thrusters | Repulsor |
+| Silver Centurion | head `1575`, body `4829` | Flight with thrusters | Repulsor |
+| Mark 42 | head `1576`, body `4830` | Flight with thrusters | Repulsor |
+| Heartbreaker | head `1577`, body `4831` | Flight with thrusters | Repulsor |
+| Hulk | head `1419`, body `4632` | Stomp pulse | Heavy energy projectile |
+| Red Hulk | head `1592`, body `4852` | Stomp pulse | Heavy energy projectile |
+| She-Hulk | head `1593`, body `4853` | Stomp pulse | Heavy energy projectile |
+| A-Bomb | head `1591`, body `4851` | Stomp pulse | Heavy energy projectile |
+| Skaar | head `1594`, body `4854` | Stomp pulse | Heavy energy projectile |
+| Spider-Man | body `4626` | Web aura | Web strike |
+| Iron Spider | head `1590`, body `4850` | Web aura | Web strike |
+| Venom | body `4627` | Web aura | Web strike |
+| The Lizard | body `4629` | Energy aura | Slime projectile |
+| Iron Fist | head `2064`, body `4624` | Energy aura | Energy projectile |
+| Loki | head `1415`, body `4625` | Energy aura | Energy projectile |
+| Nova | head `1414`, body `4623` | Flight with thrusters | Energy projectile |
+| Ms Marvel | head `1413`, body `4622` | Flight with thrusters | Energy projectile |
+| Captain Marvel | head `1570`, body `4824` | Flight with thrusters | Energy projectile |
+| Captain America Shield | hand `5154` | Shield guard | Returning shield |
+| Mjolnir | hand `5155` | Lightning aura | Lightning strike |
+| Freezing Super Gloves | hand `5156` | Ice crystals | Ice projectile |
+| Shocking Super Gloves | hand `5157` | Lightning aura | Lightning strike |
+| Cosmic Super Gloves | hand `5158` | Energy aura | Energy projectile |
+| Electro Blast Gloves | hand `5240` | Visual fade | Energy projectile |
+| Force Wave Power Gloves | hand `5241` | Energy aura | Energy projectile |
+| Magma Power Gloves | hand `5242` | Stomp pulse | Fireball |
+| Crystal Shards Power Gloves | hand `5243` | Ice crystals | Crystal |
+| Telekinesis Power Gloves | hand `5244` | Energy aura | Kinetic pulse |
+| Ooze Power Gloves | hand `5245` | Energy aura | Slime projectile |
+| Fireball Gloves | hand `5246` | Flames | Fireball |
+| Brainwave Gloves | hand `5247` | Energy aura | Wave pulse |
+| Construct Power Gloves | hand `5249` | Block aura | Block projectile |
+| Snow Shuriken | hand `5225` | Ice crystals | Ice projectile |
+| Fire Nunchaku | hand `5226` | Flames | Fireball |
+| Water Hammer | hand `5227` | Water aura | Water projectile |
+| Luke's Lightsaber | hand `5335` | Blade glow | Light beam |
+| Anakin's Lightsaber | hand `5336` | Blade glow | Light beam |
+| Darth Vader's Lightsaber | hand `5337` | Blade glow | Light beam |
+| Blue Lightsaber | hand `5511` | Blade glow | Light beam |
+| Purple Lightsaber | hand `5512` | Blade glow | Light beam |
+| Dual Lightsabers | hand `5513` | Blade glow | Light beam |
+| The Inquisitor's Lightsaber | hand `5514` | Blade glow | Light beam |
+| Elsa's Coronation Dress | body `24177` | Ice crystals | Ice projectile |
+| Elsa's Ice Queen Dress | body `24178` | Ice crystals | Ice projectile |
+| Elsa's Spring Dress | body `24275` | Ice crystals | Ice projectile |
+| Olaf's Costume | body `24174` | Snowflakes | Snowball |
+<!-- abilities:end -->
 
 ### Original event modules
 
@@ -141,10 +214,21 @@ the tour does not intercept game input, equips only the test account, and
 captures flight, repulsor and landing. Native AVM1 traces distinguish the
 effect running in each client from merely receiving a server packet.
 
-The final two-client local run on 15 November 2026 passed: both clients executed
+The initial Iron Man two-client local run on 15 November 2026 passed: both clients executed
 flight, landed after movement and rendered the repulsor. There were no
 JavaScript errors. The change also passed 35 Python checks, 15 JavaScript
 checks and the five Nginx host/path configurations. These results cover the
 new Iron Man effects, not the separate original Marvel event protocol. An
 existing Hard Hat dance also loaded action 36 successfully in the real client
 with the extension installed.
+
+The expanded catalogue was then checked with **all 47 profiles on two real
+connected clients**, using normal server-validated equipment changes and real
+D/T controls. Every profile passed its dance and throw checks on both clients;
+three ninja weapons retained their native dance. There were no JavaScript
+errors or missing clothing resources. The final regression passed **35 Python
+and 18 JavaScript checks**. Screenshots and the build-tagged result are saved in
+`.validation/local-stack/abilities-results.json` and `ability-*.png`.
+
+Run `node tests/abilities-browser-smoke.cjs` after starting the disposable stack
+to repeat the full matrix. It seeds only that fixture's accounts and inventory.

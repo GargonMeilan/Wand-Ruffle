@@ -58,8 +58,9 @@ certifica que las 685 reglas funcionen en Ruffle.
 
 ### Acciones de Iron Man añadidas por este fork
 
-Este fork añade dos acciones visuales al conjunto exacto de Iron Man: capucha
-`1412`, traje `4621` y huecos de cara, cuello, mano y pies vacíos. Pulsa **D**
+Este fork añade vuelo y repulsores a Iron Man: capucha `1412` y traje `4621`.
+Se permiten accesorios; un arma de mano reconocida tiene prioridad al disparar
+y el traje conserva su efecto de baile. Pulsa **D**
 o selecciona bailar para elevarte con propulsores. Muévete para aterrizar.
 Pulsa **T** y haz clic en un objetivo para disparar un repulsor en lugar de una
 bola. Cambiarte de ropa o transformarte también termina el vuelo.
@@ -85,6 +86,78 @@ Usa FFDec 26.3.0. El constructor rechaza un SWF base distinto sin revisar y
 registra hashes de código, compilador y resultado en
 `world_manager/client/build.json`. Guarda juntos código, SWF generado y registro.
 No hace falta compilar para ponerse el traje, bailar, disparar o cambiar de sala.
+
+<!-- abilities:start -->
+### Catálogo ampliado de habilidades
+
+La ampliación habilita **47 perfiles de equipamiento con 63 IDs de objetos**.
+La tabla indica las piezas necesarias; se permiten accesorios adicionales. Los
+IDs de canje se normalizan como en el cliente original (por ejemplo Olaf
+`34174` coincide con `24174`). No se regalan objetos ni hace falta activar un evento.
+
+Pulsa **D** para el baile, muévete para terminar y usa **T + clic** para lanzar.
+**Los bailes originales tienen prioridad** frente al efecto alternativo indicado.
+Al combinar un traje y un arma compatibles, el traje tiene prioridad al bailar
+y el arma al lanzar. Son **efectos visuales nuevos y sincronizados**, no scripts
+originales de fiesta restaurados: no causan daño ni congelan a otros jugadores;
+tampoco teletransportan, construyen muebles o conceden premios.
+
+Las 685 reglas originales de vestimenta/acción siguen utilizándose. Las
+transformaciones nativas y las prendas fuera del catálogo conservan su
+comportamiento. Los perfiles están en `world_manager/client/costume-profiles.json`;
+el constructor valida tipos de objeto y sprites. Los dibujos están en
+`ability-renderers.as` y los hashes de compilación cubren ambos códigos y los perfiles.
+
+| Objeto o conjunto | IDs necesarios | Alternativa de D | T + clic |
+| --- | --- | --- | --- |
+| Iron Man | cabeza `1412`, cuerpo `4621` | Vuelo con propulsores | Repulsor |
+| Iron Patriot | cabeza `1574`, cuerpo `4828` | Vuelo con propulsores | Repulsor |
+| Silver Centurion | cabeza `1575`, cuerpo `4829` | Vuelo con propulsores | Repulsor |
+| Mark 42 | cabeza `1576`, cuerpo `4830` | Vuelo con propulsores | Repulsor |
+| Heartbreaker | cabeza `1577`, cuerpo `4831` | Vuelo con propulsores | Repulsor |
+| Hulk | cabeza `1419`, cuerpo `4632` | Pisotón con ondas | Proyectil energético pesado |
+| Red Hulk | cabeza `1592`, cuerpo `4852` | Pisotón con ondas | Proyectil energético pesado |
+| She-Hulk | cabeza `1593`, cuerpo `4853` | Pisotón con ondas | Proyectil energético pesado |
+| A-Bomb | cabeza `1591`, cuerpo `4851` | Pisotón con ondas | Proyectil energético pesado |
+| Skaar | cabeza `1594`, cuerpo `4854` | Pisotón con ondas | Proyectil energético pesado |
+| Spider-Man | cuerpo `4626` | Aura de telaraña | Telaraña |
+| Iron Spider | cabeza `1590`, cuerpo `4850` | Aura de telaraña | Telaraña |
+| Venom | cuerpo `4627` | Aura de telaraña | Telaraña |
+| The Lizard | cuerpo `4629` | Aura de energía | Proyectil viscoso |
+| Iron Fist | cabeza `2064`, cuerpo `4624` | Aura de energía | Proyectil de energía |
+| Loki | cabeza `1415`, cuerpo `4625` | Aura de energía | Proyectil de energía |
+| Nova | cabeza `1414`, cuerpo `4623` | Vuelo con propulsores | Proyectil de energía |
+| Ms Marvel | cabeza `1413`, cuerpo `4622` | Vuelo con propulsores | Proyectil de energía |
+| Captain Marvel | cabeza `1570`, cuerpo `4824` | Vuelo con propulsores | Proyectil de energía |
+| Captain America Shield | mano `5154` | Protección con escudo | Escudo de ida y vuelta |
+| Mjolnir | mano `5155` | Aura de rayos | Rayo |
+| Freezing Super Gloves | mano `5156` | Cristales de hielo | Proyectil de hielo |
+| Shocking Super Gloves | mano `5157` | Aura de rayos | Rayo |
+| Cosmic Super Gloves | mano `5158` | Aura de energía | Proyectil de energía |
+| Electro Blast Gloves | mano `5240` | Desvanecimiento visual | Proyectil de energía |
+| Force Wave Power Gloves | mano `5241` | Aura de energía | Proyectil de energía |
+| Magma Power Gloves | mano `5242` | Pisotón con ondas | Bola de fuego |
+| Crystal Shards Power Gloves | mano `5243` | Cristales de hielo | Cristal |
+| Telekinesis Power Gloves | mano `5244` | Aura de energía | Pulso cinético |
+| Ooze Power Gloves | mano `5245` | Aura de energía | Proyectil viscoso |
+| Fireball Gloves | mano `5246` | Llamas | Bola de fuego |
+| Brainwave Gloves | mano `5247` | Aura de energía | Pulso de ondas |
+| Construct Power Gloves | mano `5249` | Aura de bloques | Proyectil de bloques |
+| Snow Shuriken | mano `5225` | Cristales de hielo | Proyectil de hielo |
+| Fire Nunchaku | mano `5226` | Llamas | Bola de fuego |
+| Water Hammer | mano `5227` | Aura de agua | Proyectil de agua |
+| Luke's Lightsaber | mano `5335` | Brillo de sable | Haz de luz |
+| Anakin's Lightsaber | mano `5336` | Brillo de sable | Haz de luz |
+| Darth Vader's Lightsaber | mano `5337` | Brillo de sable | Haz de luz |
+| Blue Lightsaber | mano `5511` | Brillo de sable | Haz de luz |
+| Purple Lightsaber | mano `5512` | Brillo de sable | Haz de luz |
+| Dual Lightsabers | mano `5513` | Brillo de sable | Haz de luz |
+| The Inquisitor's Lightsaber | mano `5514` | Brillo de sable | Haz de luz |
+| Elsa's Coronation Dress | cuerpo `24177` | Cristales de hielo | Proyectil de hielo |
+| Elsa's Ice Queen Dress | cuerpo `24178` | Cristales de hielo | Proyectil de hielo |
+| Elsa's Spring Dress | cuerpo `24275` | Cristales de hielo | Proyectil de hielo |
+| Olaf's Costume | cuerpo `24174` | Copos de nieve | Bola de nieve |
+<!-- abilities:end -->
 
 ### Módulos originales del evento
 
@@ -140,10 +213,23 @@ que el tutorial no intercepte los controles, equipa únicamente la cuenta de
 prueba y captura vuelo, repulsor y aterrizaje. Las trazas AVM1 distinguen la
 ejecución del efecto en cada cliente de la mera recepción de un paquete.
 
-La prueba local final con dos clientes del 15 de noviembre de 2026 pasó: ambos
+La primera prueba local de Iron Man con dos clientes del 15 de noviembre de 2026 pasó: ambos
 ejecutaron el vuelo, aterrizaron al moverse y dibujaron el repulsor. No hubo
 errores JavaScript. Pasaron además 35 comprobaciones Python, 15 JavaScript y
 las cinco configuraciones de Nginx de hosts y rutas. Estos resultados cubren
 los efectos nuevos de Iron Man, no el protocolo original de la fiesta Marvel.
 También se comprobó en el cliente real que el casco de obra sigue cargando
 correctamente la acción 36 con la extensión instalada.
+
+Después se comprobaron **los 47 perfiles con dos clientes reales conectados**,
+cambiando el equipamiento mediante los paquetes normales validados por el
+servidor y usando D/T. Todos pasaron las comprobaciones de baile y lanzamiento
+en ambos clientes; las tres armas ninja conservaron su baile nativo. No hubo
+errores JavaScript ni recursos de ropa ausentes. La regresión final pasó
+**35 comprobaciones Python y 18 JavaScript**. Las capturas y el resultado con
+hash de compilación están en `.validation/local-stack/abilities-results.json`
+y `ability-*.png`.
+
+Para repetir toda la matriz, arranca el stack desechable y ejecuta
+`node tests/abilities-browser-smoke.cjs`. Solo prepara las cuentas e inventario
+de ese entorno de prueba.
