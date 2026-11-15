@@ -1,147 +1,199 @@
-# Wand — Ruffle edition
+# Wand · Ruffle Edition
 
-This fork adapts Wand to run Club Penguin Legacy (AS2) and Vanilla (AS3) in
-modern browsers with Ruffle, without installing the Flash browser plugin.
-Wand configures Dash, Houdini, Snowflake and the media servers with Docker Compose.
-Ruffle compatibility is still partial; see the limitations below.
+**Club Penguin Legacy and Vanilla in the browser, with Docker Compose, Ruffle and an expanded administration panel.**
 
-**[Guía en español: Ruffle y nuevo panel de administración](docs/getting-started.es.md)**
+[English](README.md) · [Español](README.es.md) · [Documentation](docs/README.md)
 
-## What this fork adds
+Wand assembles the game server, account services, media and infrastructure needed to operate a Club Penguin server. This fork extends [Solero's Wand](https://github.com/solero/wand) with a locally hosted Ruffle runtime so the existing Flash clients can run without a Flash browser plugin.
 
-- Locally hosted Ruffle for both clients, with an internal WebSocket/TCP bridge
-  for game connections and Card-Jitsu Snow routing.
-- An expanded `/manager` interface with room designs, music, event resource
-  packages, previews and live player monitoring, alongside account moderation.
-- A bundled library of 16 events from 2012, containing 303 room designs and
-  76 references to companion resources.
-- Dokploy deployment configuration, persistent database/cache/world volumes,
-  coordinated startup and automated integration checks.
+It also gives moderators tools to preview and publish Vanilla room designs, apply historical resource packages and inspect connected players. The backend and media remain upstream Git submodules; browser adapters and administration extensions live in this repository.
 
-## Browser clients and administration
+> **Project status:** authenticated Vanilla sessions, room changes and player monitoring have been verified locally. Ruffle compatibility is partial. Historical packages provide recovered resources, not complete implementations of every event mechanic.
 
-Legacy now uses a locally hosted, pinned Ruffle runtime and a WebSocket/TCP
-bridge. Vanilla also uses Ruffle through its original page and FlashVars; see
-[Vanilla integration](docs/vanilla.md). See [Ruffle and Dokploy deployment](docs/ruffle.md)
-for HTTPS domains, configuration, validation, limitations and rollback.
+## Contents
 
-Vanilla room decorations and music can be managed at `/manager/world`; see
-[Runtime rooms and event inventory](docs/events.md) for setup, uploads,
-decoration packages, client reloads and the limits of the bundled event assets.
-The [preinstalled event library and room previews](docs/event-catalogue.md)
-include 16 historical resource packages, with 303 room designs and archived
-companion files. The manager uses one English interface across all menus.
-The moderator panel also includes [Online players](docs/online.md), with live
-server and room snapshots for Legacy and Vanilla.
+[Features](#what-changes-in-this-fork) · [Architecture](#architecture) · [Installation](#installation) · [Configuration](#configuration) · [Administration](#administration) · [Events](#historical-event-library) · [Updates](#updates-and-persistent-data) · [Compatibility](#compatibility-and-validation) · [Development](#development-and-contributions)
 
-For Dokploy, select **`docker-compose.dokploy.yml`**, enable Git submodules and
-configure HTTPS domains on `web:80`. PostgreSQL and Redis use stable Docker
-volumes outside the Git checkout. Keep the project name unchanged. Existing
-bind-mount data is not migrated automatically; read the deployment guide before
-switching an installation whose accounts must be preserved.
+## What changes in this fork
 
-The base Compose publishes no host ports. For direct access without Dokploy,
-add `-f docker-compose.direct.yml` after `-f docker-compose.yml` to publish the
-original ports. Do not enable that optional file behind Dokploy's proxy.
+| Area | Upstream foundation | Fork additions |
+| --- | --- | --- |
+| Clients | Legacy AS2 and Vanilla AS3 Flash clients | Self-hosted Ruffle 0.7.1, preserved startup parameters and selectable Flash fallback |
+| Connections | Houdini and Snowflake TCP services | Internal Websockify 0.13.0 bridge, Nginx WebSocket routes and explicit origin/destination checks |
+| Administration | Dash account management and moderation | Unified menu, room designs, music, previews, resource packages and online monitoring |
+| Events | Media pinned through submodules | 16 archived 2012 packages, 303 room variants and 76 companion-resource references |
+| Deployment | Docker Compose stack | Complete Dokploy configuration, optional host ports, stable volumes and coordinated readiness |
+| Verification | Existing components | Client, manager, proxy, persistence and backend-startup checks |
 
-> [!NOTE]
-> This can also be ran on Windows using WSL.
+Other fixes cover registration routes, Vanilla media loading, Card-Jitsu Snow parameters, Redis health checks and source mounts during checkout. See [architecture and fork boundaries](docs/architecture.md).
 
-## Installation script
+## Architecture
 
-The inherited `install.sh` still clones `solero/wand`. To install this Ruffle
-fork, use the manual setup below or the [Dokploy guide](docs/ruffle.md).
-## Manual setup
+~~~text
+Browser
+  ├─ HTTP(S) ──> Nginx ──> Ruffle, client pages and media
+  │                 └────> Dash + world_manager
+  └─ WS(S) ───> Nginx ──> Websockify ── TCP ──> Houdini / Snowflake
+                                                   │
+                                             PostgreSQL + Redis
+~~~
 
-Install this fork and its submodules, configure `.env` for your domains and
-credentials, then start the services. For a guided explanation, use the
-[Spanish getting-started guide](docs/getting-started.es.md).
+In Dokploy, Traefik terminates HTTPS/WSS and forwards to `web:80`. Room selections and uploads use the persistent `world_data` volume.
 
-**Step 1** Choose your Linux Distribution
+| Component | Responsibility |
+| --- | --- |
+| Houdini | Login and four worlds: Blizzard, Glaciar, Avalanche and Yeti |
+| Dash | Registration, account services and moderator administration |
+| Snowflake | Card-Jitsu Snow backend |
+| Nginx / web | Pages, media, Ruffle and HTTP/WebSocket routing |
+| Websockify | Browser WebSockets to fixed internal TCP destinations |
+| PostgreSQL / Redis | Game/account data, cache and temporary player snapshots |
+| world_manager | Fork extension for persistent room/resource selections and monitoring |
 
-<details>
-  <summary>Debian/Ubuntu</summary>
+## Installation
 
-```bash
-$ sudo apt update
-$ sudo apt install git curl
-$ curl -fsSL https://get.docker.com -o get-docker.sh
-$ sh get-docker.sh
-$ sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-$ sudo chmod +x /usr/local/bin/docker-compose
-```
-</details>
+### Requirements
 
-<details>
-  <summary>Fedora/RHEL</summary>
-  
-```bash
-$ sudo dnf update
-$ sudo dnf install git curl
-$ curl -fsSL https://get.docker.com -o get-docker.sh
-$ sh get-docker.sh
-$ sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-$ sudo chmod +x /usr/local/bin/docker-compose
-```
-</details>
+- Git with access to the submodule repositories.
+- Docker Engine and Docker Compose v2 supporting the supplied configuration, including health-check start intervals and dependency restart propagation.
+- Space for media, submodule histories, images and persistent data. Media histories occupy several GB.
+- Public hosting requires DNS, configured game/media URLs and HTTPS termination.
+- Windows development uses Docker Desktop with Linux containers; WSL is also an option.
 
-<details>
-  <summary>Arch based distros</summary>
-  
-```bash
-$ sudo pacman -Syu
-$ sudo pacman -S docker docker-compose git curl
-$ systemctl start docker.service
-$ systemctl enable docker.service
-```
-</details>
+Python and Node.js are needed for development checks, not to launch the containerized stack.
 
+### Clone and configure
 
-**Step 2** Clone the repository & submodules
-```bash
-$ git clone --recurse-submodules https://github.com/GargonMeilan/wand-fork.git
-$ cd wand-fork
-```
+~~~sh
+git clone --recurse-submodules https://github.com/GargonMeilan/wand-fork.git
+cd wand-fork
+~~~
 
-**Step 3** Edit the config file (set credentials and public URLs for your installation)
-```bash
-$ nano .env
-```
+For an existing checkout, run `git submodule update --init --recursive`. The inherited `install.sh` still clones `solero/wand`; use these instructions to install this fork.
 
-**Step 4** Start the services
-```bash
-$ sudo docker-compose -f docker-compose.yml -f docker-compose.direct.yml up
-```
+Edit the included `.env` with the database password, game address, public game/media URLs and optional email/CAPTCHA settings. The localhost values are examples, not a public-server configuration. Both clients default to Ruffle.
 
-**Step 5** You're done!
+### Deploy with Dokploy
 
-Open the configured `WEB_LEGACY_PLAY` or `WEB_VANILLA_PLAY` URL to play. Ruffle is
-the default for both clients (`LEGACY_PLAYER=ruffle`, `VANILLA_PLAYER=ruffle`).
-For administration, open `/manager` on a configured game host and sign in with
-a moderator account. The new menu is in English:
+1. Select this repository and the intended deployment branch. Enable **Git submodules**.
+2. Set **Compose Path** to `docker-compose.dokploy.yml`.
+3. Supply the installation's environment variables.
+4. Route all configured game/media domains to **web**, container port **80**, with HTTPS.
+5. Deploy the full stack; check registration, login, world selection and room entry.
+
+The base and Dokploy Compose files publish no host ports. Do not add the direct-access override behind Dokploy. See [deployment and configuration](docs/ruffle.md) and [updates and recovery](docs/redeploy.md).
+
+### Deploy with direct access
+
+After configuring `.env` and hostname resolution:
+
+~~~sh
+docker compose -f docker-compose.yml -f docker-compose.direct.yml config --quiet
+docker compose -f docker-compose.yml -f docker-compose.direct.yml up -d --build
+~~~
+
+The direct override publishes the original web/backend ports, including PostgreSQL. Review bindings and the firewall before exposing the machine. This mode does not configure HTTPS.
+
+Open `WEB_LEGACY_PLAY` or `WEB_VANILLA_PLAY` to play, and `/manager` on a game host to administer the server.
+
+## Configuration
+
+| Variable | Purpose |
+| --- | --- |
+| `LEGACY_PLAYER`, `VANILLA_PLAYER` | `ruffle` by default; `flash` selects the previous embedding |
+| `WEB_LEGACY_PLAY`, `WEB_VANILLA_PLAY` | Public client URLs and allowed WebSocket origins |
+| `WEB_LEGACY_MEDIA`, `WEB_VANILLA_MEDIA` | Media URLs; use HTTPS when the game uses HTTPS |
+| `GAME_ADDRESS`, `GAME_LOGIN_PORT` | Houdini address/login port advertised to clients |
+| `SNOWFLAKE_HOST`, `SNOWFLAKE_PORT` | Snow address/port matched by Ruffle's socket mapping |
+| `MEDIA_LOCATION` | Snow media base; align with `WEB_VANILLA_MEDIA` |
+| `POSTGRES_USER`, `POSTGRES_PASSWORD` | Database identity and password |
+| `WEB_RECAPTCHA_SITE`, `WEB_RECAPTCHA_SECRET` | Optional CAPTCHA settings |
+| `EMAIL_METHOD`, `EMAIL_*` | Optional account email delivery |
+
+The host/port requested by Ruffle must match its socket mapping. The browser then uses WS/WSS on the game host instead of connecting directly to Houdini TCP ports. Comments in `.env` describe the remaining options.
+
+## Administration
+
+Sign in at `/manager` with an existing moderator account. The extension does not create an administrator automatically. The interface is in English in both documentation editions.
 
 | Menu | Purpose |
 | --- | --- |
-| Overview | Shortcuts and recent account logins |
-| Rooms & events | Preview and apply Vanilla room designs, music and event resources |
-| Online players | Find connected players by server, room, name or ID |
-| Players | Existing player management and moderation |
-| Username review | Review pending usernames |
-| Account | Change your password or email, or sign out |
+| **Overview** | Main shortcuts and recent account logins |
+| **Rooms & events** | Preview, upload, apply and restore Vanilla designs, music and packages |
+| **Online players** | Find connected players by world, room, name or ID |
+| **Players** | Existing player management and moderation |
+| **Username review** | Review pending usernames |
+| **Account** | Change your password/email or sign out |
 
-See [room management](docs/events.md), [the event library](docs/event-catalogue.md)
-and [online monitoring](docs/online.md) for permissions, persistence and usage.
+After initial installation, room publications need no rebuild or restart and persist across container recreation. Players receive a reload notice because the client keeps configuration in memory. Previews do not publish changes.
+
+Read [rooms and events](docs/events.md), [the catalogue](docs/event-catalogue.md) and [online players](docs/online.md) for workflows and permissions.
+
+## Historical event library
+
+The repository includes **16 packages from 2012**, **303 room designs** and **76 companion-resource references**: 377 unique SWF files, approximately 62 MiB. No manual upload or startup download is required.
+
+Examples include Medieval Party, Marvel Super Hero Takeover, Ultimate Jam, Halloween and Operation: Blackout. Each package lists recovered content and missing features. Ruffle previews leave the active world unchanged.
+
+Applying a package replaces the selected room/resource configuration. It does not automatically implement powers, transformations, objectives or special rewards. See [the full catalogue](docs/event-catalogue.md).
+
+## Updates and persistent data
+
+| Volume | Content |
+| --- | --- |
+| `<project>_postgres_data` | PostgreSQL database |
+| `<project>_redis_data` | Redis persistence |
+| `<project>_world_data` | Room selections, publication history and uploads |
+
+Back up the database and the whole world-state volume before updating. Keep the same Compose project name and bindings. Migration from `./.data` and `./.redis` bind mounts is **not automatic**; selecting new volumes does not copy accounts.
+
+Source/media still use bind mounts. Replacing the checkout may require container recreation. Follow [the update procedure](docs/redeploy.md); do not use `down -v` or fresh-volume options to update.
+
+`master` is the integration branch. `feature/ruffle-support` is retained for the existing test server. Merging into `master` does not change that server's selected branch or synchronize subsequent changes back to it.
 
 ## Compatibility and validation
 
-Local Docker/browser validation includes real sessions entering rooms, room
-design/music changes and player monitoring. Historical event packages replace
-the listed resources; they do not implement complete quests, powers or rewards.
-A complete Card-Jitsu Snow match and all inherited activation, membership,
-social and minigame features have not been validated. HTTPS and real Dokploy
-domains require checks on the deployed installation.
+| Area | Documented status |
+| --- | --- |
+| Vanilla/Ruffle | Local authenticated login, world selection and room entry verified |
+| Rooms/music | Published changes served by Nginx and loaded by the client |
+| Event packages | Included resource mappings checked; event mechanics remain incomplete |
+| Online players | Multiple worlds, movement, disconnects and stale-world recovery checked |
+| Docker stack | Proxy chain, persistence and startup/recovery covered by checks |
+| Card-Jitsu Snow | Routing and connection-context regression covered; full match unverified |
+| Other features | Activation, membership, social services, Water and all minigames are not fully validated |
+| Public hosting | Real domains, TLS, Traefik and browser coverage need installation-specific checks |
 
-See [local validation](docs/local-validation.md) for results and known limits,
-and [redeployment](docs/redeploy.md) before updating an existing installation.
-Keep the Compose project name and persistent volumes; existing bind-mount data
-is not migrated automatically.
+See [validation](docs/validation.md) and the [local report](docs/local-validation.md). Passing automated checks does not establish compatibility with every Flash feature.
+
+## Repository layout
+
+~~~text
+.github/workflows/   CI validation
+docs/                English guides and matching *.es.md editions
+templates/           Client-page and Nginx templates
+web/ruffle/          Runtime dependency and browser adapters
+websocket/           Internal Websockify service
+world_manager/       Administration extension, state store and catalogue
+scripts/             Compose generation, source preparation and catalogue tools
+tests/               Unit, integration and browser checks
+dash/                Upstream account/admin submodule
+houdini/             Upstream game-server submodule
+snowflake/           Upstream Card-Jitsu Snow submodule
+legacy-media/        Legacy media submodule
+vanilla-media/       Vanilla media submodule
+~~~
+
+## Development and contributions
+
+Start with [the development guide](docs/development.md). Keep adapter, template and extension changes here unless a submodule update is intentional. Edit `docker-compose.yml` and regenerate Dokploy instead of editing generated YAML.
+
+Update English and Spanish documentation together when behavior changes. Include relevant checks and compatibility limits in pull requests.
+
+## Credits and licensing
+
+Built on Wand, Houdini and Dash from Solero, Snowflake from Lekuruu, Ruffle and noVNC's Websockify. Historical resources were recovered from Waddle Forever; provenance and hashes are recorded in the catalogue manifest.
+
+This repository uses the [MIT license](LICENSE.md). Submodules/dependencies retain their own licenses. Adapted Dash templates retain their [license notice](world_manager/DASH-LICENSE.md); the catalogue includes an [attribution notice](world_manager/catalog/UPSTREAM-LICENSE.txt).
+
+Club Penguin and its original assets belong to their rights holders, including Disney. The repository's MIT license does not grant rights to those assets. This is an independent community project.
