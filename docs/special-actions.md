@@ -56,6 +56,38 @@ all 685 rules work in Ruffle.
 
 ## Marvel powers are a separate mechanism
 
+### Iron Man actions added by this fork
+
+This fork now adds two visual actions for the exact Iron Man outfit: cowl
+`1412`, bodysuit `4621`, and empty face, neck, hand and feet slots. Press **D**
+or choose Dance to hover with boot thrusters. Move to land. Press **T** and
+click a target to fire a repulsor instead of a snowball. Changing clothing or
+transforming also ends the flight.
+
+These are new effects implemented here, not recovered original Iron Man
+animations. They use normal frame/snowball messages, so other clients running
+the updated module can display them. They do not add damage, mission progress
+or event rewards. An active Marvel room package is not required.
+
+The extension source is `world_manager/client/costume-effects.as`. A compiled
+copy of `rooms_common.swf` preserves Vanilla's original classes and adds this
+bootstrap. Nginx serves it through Dash on both shared and separate media hosts.
+The Vanilla submodule is unchanged. Deploy the updated web template and Dash
+extension, then reload each game client. Java/FFDec are not required at runtime.
+
+To rebuild after changing the action source:
+
+```sh
+python scripts/build-costume-effects.py --ffdec /path/to/ffdec.jar --java java
+```
+
+Use FFDec 26.3.0. The builder rejects an unreviewed upstream base SWF and records
+source/compiler/output hashes in `world_manager/client/build.json`. Commit the
+source, generated SWF and build record together. No compilation is needed to
+equip the outfit, dance, shoot or change rooms.
+
+### Original event modules
+
 Iron Man cowl `1412` plus bodysuit `4621` has no special dance/wave entry in this
 configuration. The presence of its clothing sprites alone does not establish a
 power. Do not assign an unrelated animation ID as a substitute.
@@ -76,7 +108,7 @@ be a verified full event.
 
 ## Local verification
 
-On 15 November 2026, the isolated Ruffle/Houdini test passed for all four
+Before the new Iron Man extension, on 15 November 2026 the isolated Ruffle/Houdini test passed for all four
 outfits: Hard Hat loaded action 36 and visibly drilled; Firefighter loaded
 46 and visibly sprayed water; Toy Robot loaded dance 140 (and wave 143 on
 equipment load); Iron Man sent/received the ordinary dance and loaded no
@@ -99,4 +131,20 @@ node tests/special-dance-browser.cjs
 The CLI investigation used the official [FFDec](https://github.com/jindrapetrik/jpexs-decompiler)
 portable release 26.3.0 to read the local shell, engine and common room module.
 No SWF, production account, deployed server or event activation setting was
-modified to add these existing animations.
+modified during that initial investigation. The new Iron Man extension serves
+its own generated client copy; it does not edit the upstream SWF or production
+accounts.
+
+`tests/ironman-browser-smoke.cjs` checks two real connected Ruffle clients using
+the disposable stack. It starts the fixture accounts' introductory quest so
+the tour does not intercept game input, equips only the test account, and
+captures flight, repulsor and landing. Native AVM1 traces distinguish the
+effect running in each client from merely receiving a server packet.
+
+The final two-client local run on 15 November 2026 passed: both clients executed
+flight, landed after movement and rendered the repulsor. There were no
+JavaScript errors. The change also passed 35 Python checks, 15 JavaScript
+checks and the five Nginx host/path configurations. These results cover the
+new Iron Man effects, not the separate original Marvel event protocol. An
+existing Hard Hat dance also loaded action 36 successfully in the real client
+with the extension installed.

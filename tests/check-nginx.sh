@@ -64,6 +64,8 @@ for scenario in domains paths shared flash captcha; do
             vmediahost=$(echo "$WEB_VANILLA_MEDIA" | cut -d/ -f3)
             vplaypath=$(echo "$WEB_VANILLA_PLAY" | cut -d/ -f4-)
             vmediapath=$(echo "$WEB_VANILLA_MEDIA" | cut -d/ -f4-)
+            grep -Fq "location = /${vmediapath:+$vmediapath/}play/v2/client/rooms_common.swf" /etc/nginx/conf.d/vanilla.conf
+            grep -Fq "proxy_pass http://dash:3000/world/client-file/rooms_common.swf" /etc/nginx/conf.d/vanilla.conf
             wget -qO /tmp/vanilla --header="Host: $vplayhost" "http://127.0.0.1/${vplaypath:+$vplaypath/}"
             if [ "$VANILLA_PLAYER" = flash ]; then ! grep -q /__wand/ruffle/vanilla.js /tmp/vanilla; else grep -q /__wand/ruffle/vanilla.js /tmp/vanilla; fi
             wget -qO- --header="Host: $vmediahost" "http://127.0.0.1/${vmediapath:+$vmediapath/}play/v2/client/club_penguin.swf" | grep -q vanilla

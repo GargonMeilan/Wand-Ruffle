@@ -56,6 +56,38 @@ certifica que las 685 reglas funcionen en Ruffle.
 
 ## Los poderes de Marvel usan otro mecanismo
 
+### Acciones de Iron Man añadidas por este fork
+
+Este fork añade dos acciones visuales al conjunto exacto de Iron Man: capucha
+`1412`, traje `4621` y huecos de cara, cuello, mano y pies vacíos. Pulsa **D**
+o selecciona bailar para elevarte con propulsores. Muévete para aterrizar.
+Pulsa **T** y haz clic en un objetivo para disparar un repulsor en lugar de una
+bola. Cambiarte de ropa o transformarte también termina el vuelo.
+
+Son efectos nuevos implementados aquí, no animaciones originales recuperadas.
+Utilizan los mensajes normales de frame y bola, de modo que los demás clientes
+con el módulo actualizado pueden mostrarlos. No añaden daño, progreso de
+misiones ni recompensas. No requieren activar un paquete de salas de Marvel.
+
+El código está en `world_manager/client/costume-effects.as`. Una copia compilada
+de `rooms_common.swf` conserva las clases originales y añade el inicializador.
+Nginx la sirve mediante Dash tanto con medios en el mismo host como separados.
+El submódulo Vanilla no se modifica. Despliega la plantilla web y la extensión
+Dash actualizadas, y recarga cada cliente. Java/FFDec no se necesitan en ejecución.
+
+Para reconstruir tras cambiar el código de las acciones:
+
+```sh
+python scripts/build-costume-effects.py --ffdec /ruta/a/ffdec.jar --java java
+```
+
+Usa FFDec 26.3.0. El constructor rechaza un SWF base distinto sin revisar y
+registra hashes de código, compilador y resultado en
+`world_manager/client/build.json`. Guarda juntos código, SWF generado y registro.
+No hace falta compilar para ponerse el traje, bailar, disparar o cambiar de sala.
+
+### Módulos originales del evento
+
 La capucha de Iron Man `1412` y su traje `4621` no tienen una regla de baile o
 saludo especial en esta configuración. Tener los sprites no demuestra que
 funcione un poder. Asignar una animación ajena no lo implementaría.
@@ -76,7 +108,7 @@ esta mecánica **de 2013**; mezclar ambas ediciones no acredita un evento comple
 
 ## Validación local
 
-El 15 de noviembre de 2026 pasaron los cuatro conjuntos en Ruffle/Houdini
+Antes de añadir la extensión de Iron Man, el 15 de noviembre de 2026 pasaron los cuatro conjuntos en Ruffle/Houdini
 aislado: el casco cargó la acción 36 y mostró el taladro; el bombero cargó
 46 y lanzó agua; el robot cargó el baile 140 (y el saludo 143 al equiparse);
 Iron Man recibió el baile normal sin cargar una acción especial. Cada
@@ -97,6 +129,21 @@ node tests/special-dance-browser.cjs
 ```
 
 Se usó [FFDec](https://github.com/jindrapetrik/jpexs-decompiler) 26.3.0 portable
-por CLI para inspeccionar shell, motor y módulo común. No se modificaron SWF,
-cuentas de producción, servidores desplegados ni ajustes de activación para
-añadir estas animaciones existentes.
+por CLI para inspeccionar shell, motor y módulo común. La investigación inicial
+no modificó SWF, cuentas de producción, servidores desplegados ni ajustes de
+activación. La nueva extensión sirve su propia copia generada del cliente;
+no edita el SWF original ni cuentas de producción.
+
+`tests/ironman-browser-smoke.cjs` comprueba dos clientes Ruffle conectados al
+stack desechable. Inicia la misión introductoria de las cuentas de prueba para
+que el tutorial no intercepte los controles, equipa únicamente la cuenta de
+prueba y captura vuelo, repulsor y aterrizaje. Las trazas AVM1 distinguen la
+ejecución del efecto en cada cliente de la mera recepción de un paquete.
+
+La prueba local final con dos clientes del 15 de noviembre de 2026 pasó: ambos
+ejecutaron el vuelo, aterrizaron al moverse y dibujaron el repulsor. No hubo
+errores JavaScript. Pasaron además 35 comprobaciones Python, 15 JavaScript y
+las cinco configuraciones de Nginx de hosts y rutas. Estos resultados cubren
+los efectos nuevos de Iron Man, no el protocolo original de la fiesta Marvel.
+También se comprobó en el cliente real que el casco de obra sigue cargando
+correctamente la acción 36 con la extensión instalada.
