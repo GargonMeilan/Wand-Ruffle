@@ -1,0 +1,177 @@
+--- a/app/engine/callbacks.py
++++ b/app/engine/callbacks.py
+@@ -59,6 +59,7 @@
+         self.pending_events: Dict[Any, Dict[str, List[Deferred]]] = {}
+         self.animation_waiters: List[Deferred] = []
+         self.game = game
++        self.last_handle = 0
+ 
+     @property
+     def ids(self) -> List[int]:
+@@ -93,7 +94,9 @@
+         ]
+ 
+     def next_id(self) -> int:
+-        return max(self.ids or [0]) + 1
++        # More than one client can acknowledge the same broadcast.
++        self.last_handle += 1
++        return self.last_handle
+ 
+     def by_id(self, id: int) -> Action | None:
+         return next((action for action in self.actions if action.handle_id == id), None)
+@@ -214,8 +217,7 @@
+         self.animation_waiters.append(waiter)
+ 
+         try:
+-            await waiter.addTimeout(timeout, reactor)
+-            return True
++            return await waiter.addTimeout(timeout, reactor)
+         except TimeoutError:
+             self.game.logger.warning(f'Animation Timeout: {self.pending_animations}')
+             self.reset_animations()
+@@ -229,7 +231,12 @@
+ 
+     def reset_animations(self) -> None:
+         """Clear pending actions after a timeout & send fail signal to waiters"""
+-        self.pending_actions.clear()
++        for object_id, actions in list(self.pending_actions.items()):
++            sounds = [action for action in actions if action.type == ActionType.Sound]
++            if sounds:
++                self.pending_actions[object_id] = sounds
++            else:
++                del self.pending_actions[object_id]
+         self.finish_waiters(self.animation_waiters, False)
+ 
+     def complete_animation_waiters(self) -> None:
+--- a/app/engine/game.py
++++ b/app/engine/game.py
+@@ -165,6 +165,7 @@
+ 
+         for client in self.clients:
+             client.place_loaded = client.is_bot
++            client.battle_input_registered = False
+             client.switch_place(battle_place)
+ 
+         # Wait for fake loading screen to finish
+@@ -724,8 +725,6 @@
+         for enemy in self.enemies:
+             enemy.remove_object()
+ 
+-            if enemy.flame:
+-                enemy.flame.remove_object()
+ 
+         for rock in self.rocks:
+             rock.remove_object()
+--- a/app/engine/grid.py
++++ b/app/engine/grid.py
+@@ -362,6 +362,7 @@
+         for object in self.objects:
+             if (object.grid_x in x_range) and (object.grid_y in y_range):
+                 yield object
++                continue
+ 
+             if isinstance(object, Enemy):
+                 if object.tile_range <= 0:
+--- a/app/engine/penguin.py
++++ b/app/engine/penguin.py
+@@ -60,6 +60,7 @@
+         self.mute_sounds: bool = False
+         self.in_queue: bool = False
+         self.place_loaded: bool = False
++        self.battle_input_registered = False
+         self.is_ready: bool = False
+         self.is_bot: bool = False
+         self.was_ko: bool = False
+--- a/app/engine/tusk.py
++++ b/app/engine/tusk.py
+@@ -95,6 +95,7 @@
+ 
+         for client in self.clients:
+             client.place_loaded = client.is_bot
++            client.battle_input_registered = False
+             client.switch_place(battle_place)
+ 
+         # Wait for loading screen to finish
+@@ -266,7 +267,6 @@
+ 
+     def remove_objects(self) -> None:
+         super().remove_objects()
+-        self.tusk.remove_object()
+         self.sensei.remove_object()
+ 
+     async def do_powercard_attacks(self) -> None:
+--- a/app/handlers/game/confirm.py
++++ b/app/handlers/game/confirm.py
+@@ -7,7 +7,7 @@
+ @session.framework.register('confirmClicked')
+ def on_confirm_clicked(client: Penguin, data: dict):
+     """Sent by the client after clicking on the confirm button"""
+-    if client.is_ready:
++    if not client.in_game or not client.game.timer.running or client.is_ready:
+         return
+ 
+     confirm = GameObject(
+--- a/app/handlers/game/rooms.py
++++ b/app/handlers/game/rooms.py
+@@ -8,9 +8,8 @@
+     TipPhase
+ )
+ 
+-@session.framework.register('roomToRoomMinTime')
+-def on_room_to_room_min_time(client: Penguin, data: dict):
+-    if not client.in_game:
++def register_battle_input(client: Penguin):
++    if client.battle_input_registered:
+         return
+ 
+     # Register /use event
+@@ -22,6 +21,12 @@
+         event=InputType.MOUSE_CLICK,
+         key_modifier=InputModifier.NONE
+     )
++    client.battle_input_registered = True
++
++@session.framework.register('roomToRoomMinTime')
++def on_room_to_room_min_time(client: Penguin, data: dict):
++    if client.in_game:
++        register_battle_input(client)
+ 
+ @session.framework.register('roomToRoomComplete')
+ def on_room_to_room_complete(client: Penguin, data: dict):
+@@ -29,8 +34,8 @@
+         return
+ 
+     # Client has loaded all assets
++    register_battle_input(client)
+     client.place_loaded = True
+-    client.is_ready = True
+ 
+ @session.framework.register('roomToRoomScreenClosed')
+ def on_room_to_room_screen_closed(client: Penguin, data: dict):
+--- a/app/objects/gameobject.py
++++ b/app/objects/gameobject.py
+@@ -213,7 +213,13 @@
+             # has been registered & sent to the client
+             self.remove_pending_actions(complete_waiters=False)
+ 
+-        if register:
++        # Local targeting cues and indefinite loops never gate a combat turn.
++        if (
++            register
++            and self.target is self.game
++            and name != 'blank_png'
++            and not (play_style == 'loop' and not duration)
++        ):
+             handle_id = self.game.callbacks.register_action(
+                 name=name,
+                 type=ActionType.Animation,
+--- a/app/objects/ninjas.py
++++ b/app/objects/ninjas.py
+@@ -234,6 +234,7 @@
+ 
+         if self.rage:
+             self.rage.remove_object()
++            self.rage = None
+ 
+         if not self.client.disconnected:
+             self.client.was_ko = True

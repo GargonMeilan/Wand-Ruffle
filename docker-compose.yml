@@ -526,6 +526,12 @@ services:
         bind:
           create_host_path: false
       - type: bind
+        source: ./compat/snowflake
+        target: /opt/wand/snowflake
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
         source: ./.env
         target: /usr/src/snowflake/.env
         read_only: true
@@ -548,7 +554,7 @@ services:
       - db:db
       - redis:redis
       - houdini_login:login
-    entrypoint: ["python", "./main.py"]
+    entrypoint: ["sh", "/opt/wand/snowflake/start.sh"]
     labels:
       net.unraid.docker.icon: https://raw.githubusercontent.com/solero/wand/refs/heads/master/icons/snowflake.png
 

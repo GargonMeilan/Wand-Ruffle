@@ -36,6 +36,16 @@ El adaptador decodifica `queryString` exactamente una vez para `mpProduct=cjsnow
 
 Las regresiones de protocolo/navegador distinguen el contexto codificado rechazado del formato aceptado. No autentican una partida completa.
 
+## Estabilidad del combate de Nieve
+
+Compose aplica `compat/snowflake/combat.patch` sobre una copia privada del submódulo al arrancar Snowflake. Reinicia el servicio `snowflake` para cargar las correcciones.
+
+Las animaciones en bucle, la imagen vacía al terminar una animación y las indicaciones privadas de selección dejan de bloquear el avance del turno. Los identificadores de animación son únicos durante cada partida, para que una confirmación tardía de otro cliente no complete una acción posterior. Los avisos de carga de sala registran los clics sin confirmar el turno del jugador. También se corrigen la recuperación tras tiempos de espera, la limpieza de efectos y los objetivos grandes que aparecían duplicados en los ataques de área.
+
+La regresión `tests/snow-combat-turns.py` se ejecuta con las dependencias de `snowflake/requirements.txt` y la copia parcheada en `PYTHONPATH`.
+
+La prueba local con Chromium, Ruffle y el proveedor de datos de depuración verificó la carga del tablero, los clics de movimiento y varios turnos con dos compañeros controlados por IA. Las recompensas persistentes y una partida completa con tres personas siguen pendientes de verificar.
+
 ## Límites de validación
 
 La integración posterior verificó login, mundo y sala en Vanilla, incluidos diseño histórico y música. Las pruebas iniciales de arranque no representan el último estado de integración.

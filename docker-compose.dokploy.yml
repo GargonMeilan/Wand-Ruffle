@@ -645,6 +645,12 @@ services:
       bind:
         create_host_path: false
     - type: bind
+      source: ./compat/snowflake
+      target: /opt/wand/snowflake
+      read_only: true
+      bind:
+        create_host_path: false
+    - type: bind
       source: ./.env
       target: /usr/src/snowflake/.env
       read_only: true
@@ -664,8 +670,8 @@ services:
         condition: service_healthy
         restart: true
     entrypoint:
-    - python
-    - ./main.py
+    - sh
+    - /opt/wand/snowflake/start.sh
     labels:
       net.unraid.docker.icon: https://raw.githubusercontent.com/solero/wand/refs/heads/master/icons/snowflake.png
 networks:
