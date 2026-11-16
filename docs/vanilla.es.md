@@ -40,6 +40,6 @@ Las regresiones de protocolo/navegador distinguen el contexto codificado rechaza
 
 La integración posterior verificó login, mundo y sala en Vanilla, incluidos diseño histórico y música. Las pruebas iniciales de arranque no representan el último estado de integración.
 
-Una partida completa de Nieve sigue sin verificar. El problema de Card-Jitsu Agua es independiente y sigue pendiente. Llegar al login no garantiza funciones sociales, activación, membresía, CAPTCHA ni todos los minijuegos.
+Una partida completa de Nieve sigue sin verificar. El bloqueo de arranque de Card-Jitsu Agua tiene una [corrección de compatibilidad](validation.es.md); una partida completa sigue pendiente de validar. Llegar al login no garantiza funciones sociales, activación, membresía, CAPTCHA ni todos los minijuegos.
 
 Consulta [validación](validation.es.md), [el informe local](local-validation.es.md) y [desarrollo](development.es.md).

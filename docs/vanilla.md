@@ -40,6 +40,6 @@ Protocol and browser regression checks distinguish the rejected encoded context 
 
 Local integration later verified Vanilla login, world selection and room entry, including a historical room and music. Earlier boot-only checks are not the latest end-to-end status.
 
-A complete Snow match remains unverified. The reported Card-Jitsu Water issue is separate and unresolved. Full social, activation, membership, CAPTCHA and minigame compatibility is not implied by reaching login.
+A complete Snow match remains unverified. Card-Jitsu Water has a [startup compatibility fix](validation.md); a complete match remains unverified. Full social, activation, membership, CAPTCHA and minigame compatibility is not implied by reaching login.
 
 See [validation](validation.md), [the local report](local-validation.md) and [development checks](development.md).
