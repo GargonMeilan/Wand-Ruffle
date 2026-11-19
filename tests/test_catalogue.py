@@ -2,7 +2,10 @@ import hashlib
 import json
 import sys
 import unittest
+import zipfile
+from io import BytesIO
 from pathlib import Path
+from urllib.parse import parse_qs, urlsplit
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from world_manager.store import WorldStore, validate_swf
@@ -69,6 +72,41 @@ class CatalogueStateTests(unittest.TestCase):
         reopened.change("mod", 1, "restore_all")
         self.assertIsNone(reopened.active_event())
         self.assertEqual(reopened.rooms(), reopened.baseline())
+
+    def test_event_rooms_are_published_for_an_existing_activation(self):
+        media, state = self.fixture.media, self.fixture.state
+        original_bundle = self.store.bundle_path("es")
+        original_bundle.parent.mkdir(parents=True)
+        with zipfile.ZipFile(original_bundle, "w") as bundle:
+            bundle.writestr("rooms.json", json.dumps(self.store.baseline("es", bundled=False)))
+
+        event = self.event["id"]
+        self.store.change("mod", 0, "catalog", event=event)
+        body = fixtures.swf(b"quest-room")
+        digest = hashlib.sha256(body).hexdigest()
+        self.rooms.append({"room": "870", "room_key": "party20", "sha256": digest,
+                           "music_id": 9, "event_room": True})
+        (self.catalog / "assets" / (digest + ".swf")).write_bytes(body)
+        (self.catalog / "manifest.json").write_text(json.dumps({"events": [self.event]}))
+
+        reopened = WorldStore(media, state, catalogue=self.catalog)
+        with zipfile.ZipFile(BytesIO(reopened.bundle("es"))) as bundle:
+            room = json.loads(bundle.read("rooms.json"))["870"]
+        self.assertEqual(room, reopened.rooms("es")["870"])
+        self.assertEqual((room["room_id"], room["room_key"], room["music_id"]), (870, "party20", 9))
+        path = urlsplit(room["path"])
+        self.assertEqual(path.path, "party20.swf")
+        token = parse_qs(path.query)["wand_asset"][0]
+        self.assertEqual(token, digest)
+        self.assertEqual(reopened.room_file(path.path, token).read_bytes(), body)
+        with self.assertRaises(ValueError):
+            reopened.room_file("town.swf", token)
+
+        reopened.change("mod", 1, "restore_all")
+        self.assertNotIn("870", reopened.rooms("es"))
+        self.assertEqual(reopened.bundle("es"), original_bundle.read_bytes())
+        reopened.change("mod", 2, "catalog", event=event)
+        self.assertIn("870", reopened.rooms("es"))
 
     def test_missing_resource_rolls_back_whole_event(self):
         (self.catalog / "assets" / (self.rooms[1]["sha256"] + ".swf")).unlink()

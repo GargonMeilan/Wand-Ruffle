@@ -4,7 +4,7 @@
 
 ## Included content
 
-The installation ships 16 packages from 2012, 303 room variants and 76 companion-resource references. The manifest references 377 unique SWF files, approximately 62 MiB. Town has 13 historical variants in addition to its original design.
+The installation ships 16 packages from 2012, 307 room variants and 76 companion-resource references. The manifest references 381 unique SWF files, approximately 63 MiB. Town has 13 historical variants in addition to its original design.
 
 The files are included in the repository. Operators do not need to upload them or fetch them at startup.
 

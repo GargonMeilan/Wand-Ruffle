@@ -4,7 +4,7 @@
 
 ## Contenido incluido
 
-La instalación contiene 16 paquetes de 2012, 303 variantes y 76 referencias complementarias. El manifiesto referencia 377 SWF únicos, aproximadamente 62 MiB. Town tiene 13 variantes históricas además del diseño original.
+La instalación contiene 16 paquetes de 2012, 307 variantes y 76 referencias complementarias. El manifiesto referencia 381 SWF únicos, aproximadamente 63 MiB. Town tiene 13 variantes históricas además del diseño original.
 
 Los archivos están incluidos. No es necesario subirlos ni descargarlos al arrancar.
 

@@ -1565,6 +1565,50 @@
           "git_blob": "7b41002e168dee56bc0b2bc4d3b6ff33e19ee99e"
         },
         {
+          "room": "870",
+          "room_key": "party20",
+          "event_room": true,
+          "music_id": 310,
+          "music_documented": true,
+          "sha256": "24ac464198ed5de4d41ae33fb7c26df02f60e8b9d5fd514c1f3c4f92e293ab3a",
+          "size": 136073,
+          "url": "https://raw.githubusercontent.com/nhaar/Waddle-Forever/02a9df8be1f33d570690d8a59a726a9bcc9d34df/media/default/archives/MedievalParty2012Party20.swf",
+          "git_blob": "1d02092bbe4333acea6a47cab6be9566c7eedbcd"
+        },
+        {
+          "room": "871",
+          "room_key": "party21",
+          "event_room": true,
+          "music_id": 309,
+          "music_documented": true,
+          "sha256": "c7e2f0bc3d4b739b54d36dd8f089acd5021507fc28369045de55ad41f94c5ff7",
+          "size": 108222,
+          "url": "https://raw.githubusercontent.com/nhaar/Waddle-Forever/02a9df8be1f33d570690d8a59a726a9bcc9d34df/media/default/archives/MedievalParty2012Party21.swf",
+          "git_blob": "16da5bd4da4b264083bf516561d2159f87a8f9a1"
+        },
+        {
+          "room": "872",
+          "room_key": "party22",
+          "event_room": true,
+          "music_id": 308,
+          "music_documented": true,
+          "sha256": "e29ce787fffc90b154b3fcc2c1bfdea1025044592a772dda36e8986a634136a8",
+          "size": 573424,
+          "url": "https://raw.githubusercontent.com/nhaar/Waddle-Forever/02a9df8be1f33d570690d8a59a726a9bcc9d34df/media/default/archives/MedievalParty2012Party22.swf",
+          "git_blob": "36bdafb646e65c9ecba47fd10a1b3d7656fa9792"
+        },
+        {
+          "room": "873",
+          "room_key": "party23",
+          "event_room": true,
+          "music_id": 41,
+          "music_documented": true,
+          "sha256": "c4f885de02fb31aa075eeb756362647eedc343c25932eaec9d49ce4084d59a2a",
+          "size": 97891,
+          "url": "https://raw.githubusercontent.com/nhaar/Waddle-Forever/02a9df8be1f33d570690d8a59a726a9bcc9d34df/media/default/archives/MedievalParty2012Party23.swf",
+          "git_blob": "92b1dfeccdcb4120d8e3df24e7baeee49ef4ddcc"
+        },
+        {
           "room": "874",
           "room_key": "party24",
           "music_id": 266,
@@ -1688,11 +1732,7 @@
         }
       ],
       "missing": [
-        "Room not included: party20 (archives:MedievalParty2012Party20.swf)",
-        "Room not included: party21 (archives:MedievalParty2012Party21.swf)",
-        "Room not included: party22 (archives:MedievalParty2012Party22.swf)",
-        "Room not included: party23 (archives:MedievalParty2012Party23.swf)",
-        "Event-specific powers, transformations, missions and rewards are not enabled. They require separate server support and gameplay verification."
+        "Other event-specific mechanics, including the scavenger hunt and the Scorn storyline, still require gameplay verification."
       ]
     },
     {
