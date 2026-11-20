@@ -29,7 +29,7 @@
          except TimeoutError:
              self.game.logger.warning(f'Animation Timeout: {self.pending_animations}')
              self.reset_animations()
-@@ -229,7 +231,12 @@
+@@ -229,12 +231,17 @@
  
      def reset_animations(self) -> None:
          """Clear pending actions after a timeout & send fail signal to waiters"""
@@ -43,6 +43,53 @@
          self.finish_waiters(self.animation_waiters, False)
  
      def complete_animation_waiters(self) -> None:
+         """Send a success signal to all animation waiters"""
+-        if not self.pending_animations:
++        if self.animation_waiters and not self.pending_animations:
+             self.finish_waiters(self.animation_waiters, True)
+ 
+     def reset_events(self) -> None:
+--- a/app/engine/cards.py
++++ b/app/engine/cards.py
+@@ -164,29 +164,24 @@
+         if self.client.ninja.hp <= 0:
+             return
+ 
+-        if self.client.selected_card != self:
++        if self.client.selected_card is not self or self not in self.client.power_card_slots:
+             return
+ 
+         if self.x == -1 and self.y == -1:
+             return
+ 
+-        # Play card animation
+-        consume_waiter = self.game.callbacks.register_event(
+-            self.client,
+-            'ConsumeCardResponse'
+-        )
++        # Spend the card even if the UI fails to acknowledge its presentation.
++        self.client.power_card_slots.remove(self)
++        self.client.selected_card = None
+         self.consume()
+-
+-        # Wait for client to consume card
+-        await self.game.callbacks.wait_for_client(
+-            'ConsumeCardResponse',
+-            client=self.client,
+-            timeout=2,
+-            waiter=consume_waiter
+-        )
+ 
+         # Wait for card animation
+         await delay(1.2)
++
++        if not self.client.has_power_cards:
++            snow_ui = self.client.get_window('cardjitsu_snowui.swf')
++            snow_ui.send_payload('updateStamina', {'cardData': None, 'cycle': False, 'stamina': 0})
++            snow_ui.send_payload('noCards')
+ 
+         await self.attack_animation()
+         self.apply_health()
 --- a/app/engine/game.py
 +++ b/app/engine/game.py
 @@ -165,6 +165,7 @@
@@ -62,6 +109,68 @@
  
          for rock in self.rocks:
              rock.remove_object()
+@@ -759,7 +758,7 @@
+                 # Unlock "Heal 15" stamp
+                 self.snow.unlock_stamp(477)
+ 
+-            await self.wait_for_animations(timeout=3)
++            await self.wait_for_animations(timeout=3.5)
+ 
+     async def do_powercard_attacks(self) -> None:
+         ninjas_with_cards = [
+@@ -780,17 +779,10 @@
+                 # Unlock "3 Combos" stamp
+                 self.unlock_stamp(485)
+ 
+-            combo_waiter = self.callbacks.register_event(
+-                self, 'comboScreenComplete'
+-            )
+             await self.display_combo_title([
+                 ninja.client.element
+                 for ninja in ninjas_with_cards
+             ])
+-            await self.callbacks.wait_for_event(
+-                'comboScreenComplete',
+-                timeout=6, waiter=combo_waiter
+-            )
+ 
+         for ninja in ninjas_with_cards:
+             await ninja.use_powercard(is_combo)
+@@ -962,8 +954,15 @@
+         await self.wait_for_window('cardjitsu_snowrounds.swf', loaded=True)
+ 
+     async def display_combo_title(self, elements: List[str]) -> None:
+-        for client in self.clients:
++        event = 'comboScreenComplete'
++        waiter = self.callbacks.register_event(self, event)
++        windows = []
++        for client in self.clients:
++            if client.disconnected or client.is_bot:
++                continue
++
+             combo_title = client.get_window('cardjitsu_snowcombos.swf')
++            windows.append(combo_title)
+             combo_title.layer = 'bottomLayer'
+             combo_title.load(
+                 {'data': elements},
+@@ -973,11 +972,12 @@
+                 yPercent=0.5
+             )
+ 
+-        await self.wait_for_window(
+-            'cardjitsu_snowcombos.swf',
+-            loaded=True,
+-            timeout=4
+-        )
++        # The combo SWF signals completion itself and then closes. A slow
++        # windowReady from another client must not delay the next attack.
++        if not await self.callbacks.wait_for_event(event, timeout=6, waiter=waiter):
++            for window in windows:
++                if not window.client.disconnected:
++                    window.close()
+ 
+     def get_payout_round(self) -> int:
+         """Get the round number for the payout screen"""
 --- a/app/engine/grid.py
 +++ b/app/engine/grid.py
 @@ -362,6 +362,7 @@
@@ -100,6 +209,45 @@
          self.sensei.remove_object()
  
      async def do_powercard_attacks(self) -> None:
+@@ -300,14 +300,7 @@
+                 # Unlock "4 Ninja Combo" stamp
+                 self.unlock_stamp(468)
+ 
+-            combo_waiter = self.callbacks.register_event(
+-                self, 'comboScreenComplete'
+-            )
+             await self.display_combo_title(elements)
+-            await self.callbacks.wait_for_event(
+-                'comboScreenComplete',
+-                timeout=6, waiter=combo_waiter
+-            )
+ 
+         await self.sensei.update_state()
+         await self.wait_for_animations()
+--- a/app/handlers/game/cards.py
++++ b/app/handlers/game/cards.py
+@@ -59,19 +59,8 @@
+ 
+ @session.framework.register('ConsumeCardResponse')
+ def on_card_consumed(client: Penguin, data: dict):
+-    if not client.selected_card:
+-        return
+-
+-    try:
+-        client.power_card_slots.remove(client.selected_card)
+-        client.selected_card = None
+-    except ValueError:
+-        pass
+-
+-    if not client.has_power_cards:
+-        snow_ui = client.get_window('cardjitsu_snowui.swf')
+-        snow_ui.send_payload('updateStamina', {'cardData': None, 'cycle': False, 'stamina': 0})
+-        snow_ui.send_payload('noCards')
++    # The server spends cards when it commits their attacks.
++    pass
+ 
+ @session.framework.register('cardCount')
+ def on_card_count(client: Penguin, data: dict):
 --- a/app/handlers/game/confirm.py
 +++ b/app/handlers/game/confirm.py
 @@ -7,7 +7,7 @@
@@ -148,8 +296,101 @@
  
  @session.framework.register('roomToRoomScreenClosed')
  def on_room_to_room_screen_closed(client: Penguin, data: dict):
+--- a/app/objects/enemies.py
++++ b/app/objects/enemies.py
+@@ -211,12 +211,16 @@
+             self.flame.remove_object()
+             self.flame = None
+ 
+-            # Reset animation
+-            self.do_later(0.8, self.idle_animation, True)
++            if self.hp > 0:
++                self.do_later(0.8, self.finish_flame_animation)
+             return
+ 
+         self.flame.rounds_left -= 1
+         self.flame_damage()
++
++    def finish_flame_animation(self) -> None:
++        if self.hp > 0 and self.game.objects.by_id(self.id) is self:
++            self.idle_animation(reset=True)
+ 
+     def movable_tiles(self) -> Iterator[GameObject]:
+         """Get all tiles that the enemy can move to from its current position"""
+@@ -370,6 +374,17 @@
+     def ko_animation(self) -> None:
+         ...
+ 
++    def play_ko_animation(self, name: str, frames: int) -> None:
++        # The defeat texture packs use 67 ms frames. Without an explicit duration
++        # the client can wait 10 seconds for an unloaded texture to finish.
++        duration = frames * 67
++        handle = self.animate_object(name, duration=duration, reset=True)
++        self.animate_object('blank_png')
++        self.ko_sound()
++
++        # Release this action independently if no client acknowledges it.
++        self.do_later(duration / 1000 + 0.25, self.game.callbacks.action_done, handle, self.id)
++
+     def hit_animation(self) -> None:
+         ...
+ 
+@@ -466,13 +481,7 @@
+         ).play()
+ 
+     def ko_animation(self) -> None:
+-        self.animate_object(
+-            'sly_ko_anim',
+-            play_style='play_once',
+-            reset=True
+-        )
+-        self.animate_object('blank_png')
+-        self.ko_sound()
++        self.play_ko_animation('sly_ko_anim', 42)
+ 
+     def hit_animation(self) -> None:
+         self.animate_object(
+@@ -603,13 +612,7 @@
+         ScrapImpact(self.game, x, y).play()
+ 
+     def ko_animation(self) -> None:
+-        self.animate_object(
+-            'scrap_ko_anim',
+-            play_style='play_once',
+-            reset=True
+-        )
+-        self.animate_object('blank_png')
+-        self.ko_sound()
++        self.play_ko_animation('scrap_ko_anim', 44)
+ 
+     def hit_animation(self) -> None:
+         self.animate_object(
+@@ -776,13 +779,7 @@
+         await delay(0.15)
+ 
+     def ko_animation(self) -> None:
+-        self.animate_object(
+-            'tank_ko_anim',
+-            play_style='play_once',
+-            reset=True
+-        )
+-        self.animate_object('blank_png')
+-        self.ko_sound()
++        self.play_ko_animation('tank_ko_anim', 34)
+ 
+     def hit_animation(self) -> None:
+         self.animate_object(
 --- a/app/objects/gameobject.py
 +++ b/app/objects/gameobject.py
+@@ -202,7 +202,7 @@
+         reset: bool = False,
+         register: bool = True,
+         callback: Callable | None = None
+-    ) -> None:
++    ) -> int:
+         """Tell the client to animate this object"""
+         asset = self.target.server.assets.by_name(name)
+         handle_id = -1
 @@ -213,7 +213,13 @@
              # has been registered & sent to the client
              self.remove_pending_actions(complete_waiters=False)
@@ -165,6 +406,22 @@
              handle_id = self.game.callbacks.register_action(
                  name=name,
                  type=ActionType.Animation,
+@@ -229,12 +235,14 @@
+             duration or '',
+             time_scale,
+             int(not reset),
+-            self.id,
++            self.id if handle_id != -1 else -1,
+             handle_id
+         )
+ 
+         if reset:
+             self.game.callbacks.complete_animation_waiters()
++
++        return handle_id
+ 
+     def set_camera_target(self) -> None:
+         self.target.send_tag('O_PLAYER', self.id)
 --- a/app/objects/ninjas.py
 +++ b/app/objects/ninjas.py
 @@ -234,6 +234,7 @@
