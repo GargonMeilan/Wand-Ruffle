@@ -113,9 +113,13 @@ class WorldStore:
         return value
 
     def snapshot(self):
+        revision, overrides, _ = self._publication()
+        return revision, overrides
+
+    def _publication(self):
         with self.db() as db:
-            row = db.execute("SELECT revision, overrides FROM settings WHERE id=1").fetchone()
-        return row["revision"], json.loads(row["overrides"])
+            row = db.execute("SELECT revision, overrides, event_id FROM settings WHERE id=1").fetchone()
+        return row["revision"], json.loads(row["overrides"]), row["event_id"]
 
     def assets(self):
         with self.db() as db:
@@ -209,6 +213,10 @@ class WorldStore:
                     self.catalogue.path(resource["sha256"])
                 overrides = {}
                 for item in preset["rooms"]:
+                    if item.get("event_room"):
+                        self.catalogue.path(item["sha256"])
+                        self.check_music(item["music_id"])
+                        continue
                     token = "catalog/" + event + "/" + item["room"]
                     overrides[item["room"]] = self.selection(item["room"], token, item["music_id"])
                 event_id = event
@@ -236,10 +244,25 @@ class WorldStore:
 
     def rooms(self, language="en", bundled=False):
         rooms = self.baseline(language, bundled=bundled)
-        return self.overlay_rooms(rooms)
+        return self._overlay_rooms(rooms, *self._publication())
 
-    def overlay_rooms(self, rooms):
-        revision, overrides = self.snapshot()
+    def _overlay_rooms(self, rooms, revision, overrides, event_id):
+        event = self.catalogue.by_id.get(event_id)
+        # Resolve event-only rooms from the catalogue so existing activations
+        # also pick up rooms added in a later version of the package.
+        if event:
+            for item in event["rooms"]:
+                if not item.get("event_room"):
+                    continue
+                room = item["room"]
+                key = item["room_key"]
+                rooms[room] = {
+                    "room_id": int(room), "room_key": key, "name": key, "display_name": key,
+                    "path": f"{key}.swf?wand_asset={item['sha256']}&wand_revision={revision}",
+                    "music_id": item["music_id"], "is_member": 0, "max_users": 80,
+                    "jump_enabled": False, "jump_disabled": True, "required_item": None,
+                    "short_name": "",
+                }
         for room, value in overrides.items():
             if room in rooms:
                 # Keep the SWF in its original directory: relative dependencies
@@ -255,14 +278,16 @@ class WorldStore:
         path = self.bundle_path(language)
         if not path.is_file():
             raise ValueError("The configuration bundle is not available.")
-        if not self.snapshot()[1]:
+        publication = self._publication()
+        if not publication[1] and not publication[2]:
             return path.read_bytes()
         output = io.BytesIO()
         with zipfile.ZipFile(path) as source, zipfile.ZipFile(output, "w") as destination:
             for info in source.infolist():
                 body = source.read(info.filename)
                 if info.filename == "rooms.json":
-                    body = json.dumps(self.overlay_rooms(json.loads(body)), separators=(",", ":")).encode()
+                    rooms = self._overlay_rooms(json.loads(body), *publication)
+                    body = json.dumps(rooms, separators=(",", ":")).encode()
                 destination.writestr(info, body)
         return output.getvalue()
 
@@ -274,6 +299,10 @@ class WorldStore:
             if not path.is_file():
                 raise ValueError("Room unavailable.")
             return path
+        for event in self.catalogue.events:
+            for item in event["rooms"]:
+                if item.get("event_room") and filename == item["room_key"] + ".swf" and token == item["sha256"]:
+                    return self.catalogue.path(token)
         matching = [room for room, data in self.baseline().items() if data["path"] == filename]
         if not any(asset["room"] in matching and asset["digest"] == token for asset in self.assets()):
             raise ValueError("This design does not belong to this room.")

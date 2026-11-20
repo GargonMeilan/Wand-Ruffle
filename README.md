@@ -1,4 +1,4 @@
-# Wand · Ruffle Edition
+# Wand Ruffle
 
 **Club Penguin Legacy and Vanilla in the browser, with Docker Compose, Ruffle and an expanded administration panel.**
 
@@ -21,7 +21,7 @@ It also gives moderators tools to preview and publish Vanilla room designs, appl
 | Clients | Legacy AS2 and Vanilla AS3 Flash clients | Self-hosted Ruffle 0.7.1, preserved startup parameters and selectable Flash fallback |
 | Connections | Houdini and Snowflake TCP services | Internal Websockify 0.13.0 bridge, Nginx WebSocket routes and explicit origin/destination checks |
 | Administration | Dash account management and moderation | Unified menu, room designs, music, previews, resource packages and online monitoring |
-| Events | Media pinned through submodules | 16 archived 2012 packages, 303 room variants and 76 companion-resource references |
+| Events | Media pinned through submodules | 16 archived 2012 packages, 307 room variants and 76 companion-resource references |
 | Deployment | Docker Compose stack | Complete Dokploy configuration, optional host ports, stable volumes and coordinated readiness |
 | Verification | Existing components | Client, manager, proxy, persistence and backend-startup checks |
 
@@ -65,8 +65,8 @@ Python and Node.js are needed for development checks, not to launch the containe
 ### Clone and configure
 
 ~~~sh
-git clone --recurse-submodules https://github.com/GargonMeilan/wand-fork.git
-cd wand-fork
+git clone --recurse-submodules https://github.com/GargonMeilan/wand-ruffle.git
+cd wand-ruffle
 ~~~
 
 For an existing checkout, run `git submodule update --init --recursive`. The inherited `install.sh` still clones `solero/wand`; use these instructions to install this fork.
@@ -131,7 +131,7 @@ Read [rooms and events](docs/events.md), [the catalogue](docs/event-catalogue.md
 
 ## Historical event library
 
-The repository includes **16 packages from 2012**, **303 room designs** and **76 companion-resource references**: 377 unique SWF files, approximately 62 MiB. No manual upload or startup download is required.
+The repository includes **16 packages from 2012**, **307 room designs** and **76 companion-resource references**: 381 unique SWF files, approximately 63 MiB. No manual upload or startup download is required.
 
 Examples include Medieval Party, Marvel Super Hero Takeover, Ultimate Jam, Halloween and Operation: Blackout. Each package lists recovered content and missing features. Ruffle previews leave the active world unchanged.
 

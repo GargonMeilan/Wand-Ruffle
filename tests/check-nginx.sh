@@ -64,9 +64,22 @@ for scenario in domains paths shared flash captcha; do
             vmediahost=$(echo "$WEB_VANILLA_MEDIA" | cut -d/ -f3)
             vplaypath=$(echo "$WEB_VANILLA_PLAY" | cut -d/ -f4-)
             vmediapath=$(echo "$WEB_VANILLA_MEDIA" | cut -d/ -f4-)
+            grep -Fq "location = /${vmediapath:+$vmediapath/}play/v2/client/rooms_common.swf" /etc/nginx/conf.d/vanilla.conf
+            grep -Fq "proxy_pass http://dash:3000/world/client-file/rooms_common.swf" /etc/nginx/conf.d/vanilla.conf
             wget -qO /tmp/vanilla --header="Host: $vplayhost" "http://127.0.0.1/${vplaypath:+$vplaypath/}"
             if [ "$VANILLA_PLAYER" = flash ]; then ! grep -q /__wand/ruffle/vanilla.js /tmp/vanilla; else grep -q /__wand/ruffle/vanilla.js /tmp/vanilla; fi
             wget -qO- --header="Host: $vmediahost" "http://127.0.0.1/${vmediapath:+$vmediapath/}play/v2/client/club_penguin.swf" | grep -q vanilla
+            wget -qO /tmp/waves --header="Host: $vmediahost" "http://127.0.0.1/${vmediapath:+$vmediapath/}play/v2/games/waves/CatchinWaves.swf?cacheVersion=21639"
+            wget -qO /tmp/water --header="Host: $vmediahost" "http://127.0.0.1/${vmediapath:+$vmediapath/}play/v2/games/water/water.swf?cacheVersion=21639"
+            cmp /tmp/waves /opt/wand/compat/CatchinWaves.swf
+            cmp /tmp/water /opt/wand/compat/water.swf
+            wget -SO /dev/null --header="Host: $vmediahost" "http://127.0.0.1/${vmediapath:+$vmediapath/}play/v2/games/waves/CatchinWaves.swf" 2>&1 | grep -qi "Cache-Control: no-store"
+            wget -SO /dev/null --header="Host: $vmediahost" "http://127.0.0.1/${vmediapath:+$vmediapath/}play/v2/games/water/water.swf" 2>&1 | grep -qi "Cache-Control: no-store"
+            if [ "$vplayhost" != "$vmediahost" ]; then
+                vplayorigin=$(echo "$WEB_VANILLA_PLAY" | cut -d/ -f1-3)
+                wget -SO /dev/null --header="Host: $vmediahost" "http://127.0.0.1/${vmediapath:+$vmediapath/}play/v2/games/waves/CatchinWaves.swf" 2>&1 | grep -Fqi "Access-Control-Allow-Origin: $vplayorigin"
+                wget -SO /dev/null --header="Host: $vmediahost" "http://127.0.0.1/${vmediapath:+$vmediapath/}play/v2/games/water/water.swf" 2>&1 | grep -Fqi "Access-Control-Allow-Origin: $vplayorigin"
+            fi
             wget -qO- --header="Host: $vplayhost" http://127.0.0.1/__wand/ruffle/vanilla.js > /dev/null
             wasm=$(basename "$(find /opt/wand/ruffle -name "*.wasm" | head -1)")
             wget -SO /dev/null --header="Host: $playhost" "http://127.0.0.1/__wand/ruffle/$wasm" 2>&1 | grep -qi "Content-Type: application/wasm"

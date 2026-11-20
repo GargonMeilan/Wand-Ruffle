@@ -43,6 +43,17 @@ server {
     }
     {{ end }}
     {{ if eq (parseUrl .Env.WEB_VANILLA_PLAY).Host (parseUrl .Env.WEB_VANILLA_MEDIA).Host }}
+    location = {{ (parseUrl .Env.WEB_VANILLA_MEDIA).Path }}/play/v2/games/waves/CatchinWaves.swf {
+        alias /opt/wand/compat/CatchinWaves.swf;
+        add_header Cache-Control "no-store" always;
+    }
+    location = {{ (parseUrl .Env.WEB_VANILLA_MEDIA).Path }}/play/v2/games/water/water.swf {
+        alias /opt/wand/compat/water.swf;
+        add_header Cache-Control "no-store" always;
+    }
+    location = {{ (parseUrl .Env.WEB_VANILLA_MEDIA).Path }}/play/v2/client/rooms_common.swf {
+        proxy_pass http://dash:3000/world/client-file/rooms_common.swf;
+    }
     location ~ ^{{ (parseUrl .Env.WEB_VANILLA_MEDIA).Path }}/play/v2/content/local/(en|es|pt|fr|ru|de)/((?:catalogues|close_ups|scavenger_hunt|membership|party|telescope)/[A-Za-z0-9_./-]+\.swf|cfc\.swf|poster\.swf|quest_interface\.swf)$ {
         proxy_pass http://dash:3000/world/event-resource/local/$1/$2$is_args$args;
     }
@@ -183,6 +194,21 @@ server {
 {{ if ne (parseUrl .Env.WEB_VANILLA_PLAY).Host (parseUrl .Env.WEB_VANILLA_MEDIA).Host }}
 server {
     server_name  {{ (parseUrl .Env.WEB_VANILLA_MEDIA).Hostname }};
+    location = {{ (parseUrl .Env.WEB_VANILLA_MEDIA).Path }}/play/v2/games/waves/CatchinWaves.swf {
+        alias /opt/wand/compat/CatchinWaves.swf;
+        add_header Cache-Control "no-store" always;
+        add_header Access-Control-Allow-Origin "{{ (parseUrl .Env.WEB_VANILLA_PLAY).Scheme }}://{{ (parseUrl .Env.WEB_VANILLA_PLAY).Host }}" always;
+        add_header Vary Origin always;
+    }
+    location = {{ (parseUrl .Env.WEB_VANILLA_MEDIA).Path }}/play/v2/games/water/water.swf {
+        alias /opt/wand/compat/water.swf;
+        add_header Cache-Control "no-store" always;
+        add_header Access-Control-Allow-Origin "{{ (parseUrl .Env.WEB_VANILLA_PLAY).Scheme }}://{{ (parseUrl .Env.WEB_VANILLA_PLAY).Host }}" always;
+        add_header Vary Origin always;
+    }
+    location = {{ (parseUrl .Env.WEB_VANILLA_MEDIA).Path }}/play/v2/client/rooms_common.swf {
+        proxy_pass http://dash:3000/world/client-file/rooms_common.swf;
+    }
     resolver 127.0.0.11 valid=10s;
 
     add_header Access-Control-Allow-Origin "{{ (parseUrl .Env.WEB_VANILLA_PLAY).Scheme }}://{{ (parseUrl .Env.WEB_VANILLA_PLAY).Host }}" always;

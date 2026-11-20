@@ -67,6 +67,17 @@ class RouteTests(unittest.IsolatedAsyncioTestCase):
         return types.SimpleNamespace(method="POST", args={}, files={}, form={"csrf": "token", **form},
             ctx=types.SimpleNamespace(session={"logged_in": True, "username": "mod", "world_csrf": "token"}))
 
+    async def test_client_extension_only_serves_its_fixed_public_resource(self):
+        request = self.request()
+        request.ctx.session.clear()
+        before = self.store.snapshot()
+        result = await self.routes.client_file(request, "rooms_common.swf")
+        self.assertIn(result.body[:3], (b"FWS", b"CWS"))
+        self.assertEqual(result.headers["Cache-Control"], "no-store")
+        for filename in ("../store.py", "engine.swf", "build.json"):
+            self.assertEqual((await self.routes.client_file(request, filename)).status, 404)
+        self.assertEqual(self.store.snapshot(), before)
+
     async def test_non_moderators_and_anonymous_users_cannot_publish(self):
         request = self.request(action="restore_all", revision="0")
         request.ctx.session["logged_in"] = False

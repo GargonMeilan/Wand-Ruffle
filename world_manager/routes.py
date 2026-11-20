@@ -159,6 +159,14 @@ async def revision(request):
     return response.json({"revision": number}, headers={"Cache-Control": "no-store"})
 
 
+@world.get("/world/client-file/<filename>")
+async def client_file(request, filename):
+    if filename != "rooms_common.swf":
+        return response.text("Not found", status=404)
+    return await response.file(str(here / "client" / filename), mime_type="application/x-shockwave-flash",
+                               headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"})
+
+
 @world.get("/world/rooms/<language>/<format>")
 async def rooms(request, language, format):
     if format not in ("json", "jsonp"):

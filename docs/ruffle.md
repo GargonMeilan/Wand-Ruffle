@@ -16,8 +16,8 @@ Use Docker Compose v2 and validate the chosen configuration. The YAML uses featu
 ## Obtain sources
 
 ~~~sh
-git clone --recurse-submodules https://github.com/GargonMeilan/wand-fork.git
-cd wand-fork
+git clone --recurse-submodules https://github.com/GargonMeilan/wand-ruffle.git
+cd wand-ruffle
 docker compose version
 ~~~
 

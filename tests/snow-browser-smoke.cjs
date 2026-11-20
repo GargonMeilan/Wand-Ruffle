@@ -28,6 +28,11 @@ const server = http.createServer((req, res) => {
     requests.push(url.pathname);
     try {
         let file;
+        if (url.pathname === '/__wand/world/revision') {
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ revision: 0 }));
+            return;
+        }
         if (url.pathname.endsWith('/web-service/snfgenerator/session')) {
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify({ hasError: false, error: '', data: 'probe' }));
@@ -44,7 +49,7 @@ const server = http.createServer((req, res) => {
             return;
         } else if (url.pathname.startsWith('/__wand/ruffle/')) {
             const name = path.basename(url.pathname);
-            file = fs.readFileSync(name === 'vanilla.js' ? `web/ruffle/${name}` : `${runtime}/${name}`);
+            file = fs.readFileSync(['vanilla.js', 'world-notice.js'].includes(name) ? `web/ruffle/${name}` : `${runtime}/${name}`);
         } else if (url.pathname === '/media/play/web_service/environment_data.xml') {
             file = Buffer.from(render(fs.readFileSync('templates/vanilla-media/media/play/web_service/environment_data.xml.template', 'utf8')));
         } else if (url.pathname === '/servers.xml') {

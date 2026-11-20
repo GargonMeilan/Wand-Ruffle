@@ -227,7 +227,7 @@ def main():
             assert result.status == 200, (event["id"], item["path"], result.status)
             assert hashlib.sha256(result.read()).hexdigest() == item["sha256"]
     post(client, "restore_all")
-    passed("All 16 installed packages activate; 303 room variants and 76 companion references are delivered through Nginx with matching hashes: OK")
+    passed("All installed packages activate and deliver their room variants and companion resources through Nginx with matching hashes: OK")
     post(client, "save", asset="original", music="9")
     assert config(client)["100"]["music_id"] == 9
     before = page_state(client)["revision"]

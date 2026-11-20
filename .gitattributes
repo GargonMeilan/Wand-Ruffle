@@ -1,3 +1,4 @@
 *.sh text eol=lf
 *.template text eol=lf
 Dockerfile text eol=lf
+compat/snowflake/*.patch text eol=lf whitespace=-blank-at-eol

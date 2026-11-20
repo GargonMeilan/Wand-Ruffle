@@ -1,4 +1,4 @@
-# Wand · Ruffle Edition
+# Wand Ruffle
 
 **Club Penguin Legacy y Vanilla en el navegador, con Docker Compose, Ruffle y un panel ampliado de administración.**
 
@@ -21,7 +21,7 @@ También permite a los moderadores previsualizar y publicar diseños de Vanilla,
 | Clientes | Clientes Flash Legacy AS2 y Vanilla AS3 | Ruffle 0.7.1 local, parámetros originales y alternativa Flash |
 | Conexiones | Servicios TCP Houdini y Snowflake | Websockify 0.13.0 interno, rutas WebSocket y comprobaciones de origen/destino |
 | Administración | Cuentas y moderación de Dash | Menú unificado, diseños, música, vistas previas, paquetes y monitorización |
-| Eventos | Medios fijados mediante submódulos | 16 paquetes de 2012, 303 variantes y 76 referencias complementarias |
+| Eventos | Medios fijados mediante submódulos | 16 paquetes de 2012, 307 variantes y 76 referencias complementarias |
 | Despliegue | Entorno Docker Compose | Configuración Dokploy, puertos opcionales, volúmenes estables y disponibilidad coordinada |
 | Verificación | Componentes existentes | Pruebas de clientes, administrador, proxies, persistencia y arranque |
 
@@ -65,8 +65,8 @@ Python y Node.js se necesitan para desarrollo, no para iniciar los contenedores.
 ### Clonar y configurar
 
 ~~~sh
-git clone --recurse-submodules https://github.com/GargonMeilan/wand-fork.git
-cd wand-fork
+git clone --recurse-submodules https://github.com/GargonMeilan/wand-ruffle.git
+cd wand-ruffle
 ~~~
 
 En un checkout existente, ejecuta `git submodule update --init --recursive`. El `install.sh` heredado todavía clona `solero/wand`; utiliza estas instrucciones para instalar este fork.
@@ -131,7 +131,7 @@ Consulta [salas y eventos](docs/events.es.md), [el catálogo](docs/event-catalog
 
 ## Biblioteca de eventos históricos
 
-El repositorio incluye **16 paquetes de 2012**, **303 diseños de salas** y **76 referencias complementarias**: 377 SWF únicos, aproximadamente 62 MiB. No necesitan subidas manuales ni descargas al arrancar.
+El repositorio incluye **16 paquetes de 2012**, **307 diseños de salas** y **76 referencias complementarias**: 381 SWF únicos, aproximadamente 63 MiB. No necesitan subidas manuales ni descargas al arrancar.
 
 Incluye Medieval Party, Marvel Super Hero Takeover, Ultimate Jam, Halloween y Operation: Blackout, entre otros. Cada paquete enumera contenido recuperado y funciones pendientes. Las vistas previas no cambian el mundo activo.
 

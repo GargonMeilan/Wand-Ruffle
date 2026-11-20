@@ -36,10 +36,20 @@ The adapter decodes `queryString` exactly once for `mpProduct=cjsnow`. It does n
 
 Protocol and browser regression checks distinguish the rejected encoded context from the accepted normal form. They do not authenticate a full match.
 
+## Snow combat stability
+
+Compose applies `compat/snowflake/combat.patch` to a private copy of the submodule when Snowflake starts. Restart the `snowflake` service to load these fixes.
+
+Indefinite animation loops, queued blank images and private targeting cues no longer block turn progression. Animation handles are unique for each match, so a delayed acknowledgement from another client cannot complete a later action. Room loading events register clicks without confirming the player's turn. The patch also fixes timeout recovery, effect cleanup and large enemies being duplicated in area attack targets.
+
+Run `tests/snow-combat-turns.py` with the dependencies from `snowflake/requirements.txt` and the patched source on `PYTHONPATH`.
+
+Local Chromium and Ruffle testing against the debug data provider verified board loading, movement clicks and multiple turns with two AI teammates. Persistent rewards and a complete match with three human players remain unverified.
+
 ## Validation boundaries
 
 Local integration later verified Vanilla login, world selection and room entry, including a historical room and music. Earlier boot-only checks are not the latest end-to-end status.
 
-A complete Snow match remains unverified. The reported Card-Jitsu Water issue is separate and unresolved. Full social, activation, membership, CAPTCHA and minigame compatibility is not implied by reaching login.
+A complete Snow match remains unverified. Card-Jitsu Water has a [startup compatibility fix](validation.md); a complete match remains unverified. Full social, activation, membership, CAPTCHA and minigame compatibility is not implied by reaching login.
 
 See [validation](validation.md), [the local report](local-validation.md) and [development checks](development.md).

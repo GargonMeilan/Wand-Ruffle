@@ -1,0 +1,585 @@
+{
+  "version": 1,
+  "profiles": [
+    {
+      "id": "iron-man",
+      "name": "Iron Man",
+      "match": {
+        "head": 1412,
+        "body": 4621
+      },
+      "dance": "flight",
+      "shot": "beam",
+      "color": 4766955,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "iron-patriot",
+      "name": "Iron Patriot",
+      "match": {
+        "head": 1574,
+        "body": 4828
+      },
+      "dance": "flight",
+      "shot": "beam",
+      "color": 4766955,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "silver-centurion",
+      "name": "Silver Centurion",
+      "match": {
+        "head": 1575,
+        "body": 4829
+      },
+      "dance": "flight",
+      "shot": "beam",
+      "color": 4766955,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "mark-42",
+      "name": "Mark 42",
+      "match": {
+        "head": 1576,
+        "body": 4830
+      },
+      "dance": "flight",
+      "shot": "beam",
+      "color": 4766955,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "heartbreaker",
+      "name": "Heartbreaker",
+      "match": {
+        "head": 1577,
+        "body": 4831
+      },
+      "dance": "flight",
+      "shot": "beam",
+      "color": 4766955,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "hulk",
+      "name": "Hulk",
+      "match": {
+        "head": 1419,
+        "body": 4632
+      },
+      "dance": "stomp",
+      "shot": "rock",
+      "color": 5877801,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "red hulk",
+      "name": "Red Hulk",
+      "match": {
+        "head": 1592,
+        "body": 4852
+      },
+      "dance": "stomp",
+      "shot": "rock",
+      "color": 14501957,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "she-hulk",
+      "name": "She-Hulk",
+      "match": {
+        "head": 1593,
+        "body": 4853
+      },
+      "dance": "stomp",
+      "shot": "rock",
+      "color": 6539077,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "a-bomb",
+      "name": "A-Bomb",
+      "match": {
+        "head": 1591,
+        "body": 4851
+      },
+      "dance": "stomp",
+      "shot": "rock",
+      "color": 3900610,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "skaar",
+      "name": "Skaar",
+      "match": {
+        "head": 1594,
+        "body": 4854
+      },
+      "dance": "stomp",
+      "shot": "rock",
+      "color": 8043342,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "spider-man",
+      "name": "Spider-Man",
+      "match": {
+        "body": 4626
+      },
+      "dance": "web",
+      "shot": "web",
+      "color": 15137279,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "iron-spider",
+      "name": "Iron Spider",
+      "match": {
+        "head": 1590,
+        "body": 4850
+      },
+      "dance": "web",
+      "shot": "web",
+      "color": 16764006,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "venom",
+      "name": "Venom",
+      "match": {
+        "body": 4627
+      },
+      "dance": "web",
+      "shot": "web",
+      "color": 7897740,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "the-lizard",
+      "name": "The Lizard",
+      "match": {
+        "body": 4629
+      },
+      "dance": "aura",
+      "shot": "ooze",
+      "color": 6472265,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "iron-fist",
+      "name": "Iron Fist",
+      "match": {
+        "head": 2064,
+        "body": 4624
+      },
+      "dance": "aura",
+      "shot": "energy",
+      "color": 16763962,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "loki",
+      "name": "Loki",
+      "match": {
+        "head": 1415,
+        "body": 4625
+      },
+      "dance": "aura",
+      "shot": "energy",
+      "color": 6084475,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "nova",
+      "name": "Nova",
+      "match": {
+        "head": 1414,
+        "body": 4623
+      },
+      "dance": "flight",
+      "shot": "energy",
+      "color": 16763962,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "ms-marvel",
+      "name": "Ms Marvel",
+      "match": {
+        "head": 1413,
+        "body": 4622
+      },
+      "dance": "flight",
+      "shot": "energy",
+      "color": 16763962,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "captain-marvel",
+      "name": "Captain Marvel",
+      "match": {
+        "head": 1570,
+        "body": 4824
+      },
+      "dance": "flight",
+      "shot": "energy",
+      "color": 16763962,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "captain-america-shield",
+      "name": "Captain America Shield",
+      "match": {
+        "hand": 5154
+      },
+      "dance": "shield",
+      "shot": "shield",
+      "color": 15102301,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 40
+    },
+    {
+      "id": "mjolnir",
+      "name": "Mjolnir",
+      "match": {
+        "hand": 5155
+      },
+      "dance": "lightning",
+      "shot": "lightning",
+      "color": 9357055,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 40
+    },
+    {
+      "id": "gloves-5156",
+      "name": "Freezing Super Gloves",
+      "match": {
+        "hand": 5156
+      },
+      "dance": "ice",
+      "shot": "ice",
+      "color": 9621247,
+      "origin": "New visual effect; equipment ID recovered from the Marvel party module",
+      "priority": 40
+    },
+    {
+      "id": "gloves-5157",
+      "name": "Shocking Super Gloves",
+      "match": {
+        "hand": 5157
+      },
+      "dance": "lightning",
+      "shot": "lightning",
+      "color": 16771660,
+      "origin": "New visual effect; equipment ID recovered from the Marvel party module",
+      "priority": 40
+    },
+    {
+      "id": "gloves-5158",
+      "name": "Cosmic Super Gloves",
+      "match": {
+        "hand": 5158
+      },
+      "dance": "aura",
+      "shot": "energy",
+      "color": 16492287,
+      "origin": "New visual effect; equipment ID recovered from the Marvel party module",
+      "priority": 40
+    },
+    {
+      "id": "gloves-5240",
+      "name": "Electro Blast Gloves",
+      "match": {
+        "hand": 5240
+      },
+      "dance": "blink",
+      "shot": "energy",
+      "color": 9230079,
+      "origin": "New visual effect; equipment ID recovered from the Marvel party module",
+      "priority": 40
+    },
+    {
+      "id": "gloves-5241",
+      "name": "Force Wave Power Gloves",
+      "match": {
+        "hand": 5241
+      },
+      "dance": "aura",
+      "shot": "energy",
+      "color": 6724095,
+      "origin": "New visual effect; equipment ID recovered from the Marvel party module",
+      "priority": 40
+    },
+    {
+      "id": "gloves-5242",
+      "name": "Magma Power Gloves",
+      "match": {
+        "hand": 5242
+      },
+      "dance": "stomp",
+      "shot": "fire",
+      "color": 16738878,
+      "origin": "New visual effect; equipment ID recovered from the Marvel party module",
+      "priority": 40
+    },
+    {
+      "id": "gloves-5243",
+      "name": "Crystal Shards Power Gloves",
+      "match": {
+        "hand": 5243
+      },
+      "dance": "ice",
+      "shot": "crystal",
+      "color": 12622847,
+      "origin": "New visual effect; equipment ID recovered from the Marvel party module",
+      "priority": 40
+    },
+    {
+      "id": "gloves-5244",
+      "name": "Telekinesis Power Gloves",
+      "match": {
+        "hand": 5244
+      },
+      "dance": "aura",
+      "shot": "kinetic",
+      "color": 12816127,
+      "origin": "New visual effect; equipment ID recovered from the Marvel party module",
+      "priority": 40
+    },
+    {
+      "id": "gloves-5245",
+      "name": "Ooze Power Gloves",
+      "match": {
+        "hand": 5245
+      },
+      "dance": "aura",
+      "shot": "ooze",
+      "color": 6609218,
+      "origin": "New visual effect; equipment ID recovered from the Marvel party module",
+      "priority": 40
+    },
+    {
+      "id": "gloves-5246",
+      "name": "Fireball Gloves",
+      "match": {
+        "hand": 5246
+      },
+      "dance": "fire",
+      "shot": "fire",
+      "color": 16738878,
+      "origin": "New visual effect; equipment ID recovered from the Marvel party module",
+      "priority": 40
+    },
+    {
+      "id": "gloves-5247",
+      "name": "Brainwave Gloves",
+      "match": {
+        "hand": 5247
+      },
+      "dance": "aura",
+      "shot": "sonic",
+      "color": 13273087,
+      "origin": "New visual effect; equipment ID recovered from the Marvel party module",
+      "priority": 40
+    },
+    {
+      "id": "gloves-5249",
+      "name": "Construct Power Gloves",
+      "match": {
+        "hand": 5249
+      },
+      "dance": "construct",
+      "shot": "construct",
+      "color": 16766021,
+      "origin": "New visual effect; equipment ID recovered from the Marvel party module",
+      "priority": 40
+    },
+    {
+      "id": "weapon-5225",
+      "name": "Snow Shuriken",
+      "match": {
+        "hand": 5225
+      },
+      "dance": "ice",
+      "shot": "ice",
+      "color": 9621247,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 40
+    },
+    {
+      "id": "weapon-5226",
+      "name": "Fire Nunchaku",
+      "match": {
+        "hand": 5226
+      },
+      "dance": "fire",
+      "shot": "fire",
+      "color": 16738878,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 40
+    },
+    {
+      "id": "weapon-5227",
+      "name": "Water Hammer",
+      "match": {
+        "hand": 5227
+      },
+      "dance": "water",
+      "shot": "water",
+      "color": 6724095,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 40
+    },
+    {
+      "id": "weapon-5335",
+      "name": "Luke's Lightsaber",
+      "match": {
+        "hand": 5335
+      },
+      "dance": "saber",
+      "shot": "saber",
+      "color": 7208850,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 40
+    },
+    {
+      "id": "weapon-5336",
+      "name": "Anakin's Lightsaber",
+      "match": {
+        "hand": 5336
+      },
+      "dance": "saber",
+      "shot": "saber",
+      "color": 6724095,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 40
+    },
+    {
+      "id": "weapon-5337",
+      "name": "Darth Vader's Lightsaber",
+      "match": {
+        "hand": 5337
+      },
+      "dance": "saber",
+      "shot": "saber",
+      "color": 16731712,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 40
+    },
+    {
+      "id": "weapon-5511",
+      "name": "Blue Lightsaber",
+      "match": {
+        "hand": 5511
+      },
+      "dance": "saber",
+      "shot": "saber",
+      "color": 6724095,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 40
+    },
+    {
+      "id": "weapon-5512",
+      "name": "Purple Lightsaber",
+      "match": {
+        "hand": 5512
+      },
+      "dance": "saber",
+      "shot": "saber",
+      "color": 12941823,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 40
+    },
+    {
+      "id": "weapon-5513",
+      "name": "Dual Lightsabers",
+      "match": {
+        "hand": 5513
+      },
+      "dance": "saber",
+      "shot": "saber",
+      "color": 6724095,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 40
+    },
+    {
+      "id": "weapon-5514",
+      "name": "The Inquisitor's Lightsaber",
+      "match": {
+        "hand": 5514
+      },
+      "dance": "saber",
+      "shot": "saber",
+      "color": 16731712,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 40
+    },
+    {
+      "id": "frozen-24177",
+      "name": "Elsa's Coronation Dress",
+      "match": {
+        "body": 24177
+      },
+      "dance": "ice",
+      "shot": "ice",
+      "color": 11592959,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "frozen-24178",
+      "name": "Elsa's Ice Queen Dress",
+      "match": {
+        "body": 24178
+      },
+      "dance": "ice",
+      "shot": "ice",
+      "color": 11592959,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "frozen-24275",
+      "name": "Elsa's Spring Dress",
+      "match": {
+        "body": 24275
+      },
+      "dance": "ice",
+      "shot": "ice",
+      "color": 11592959,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    },
+    {
+      "id": "frozen-24174",
+      "name": "Olaf's Costume",
+      "match": {
+        "body": 24174
+      },
+      "dance": "snow",
+      "shot": "snow",
+      "color": 16777215,
+      "origin": "New visual effect inspired by the equipped item",
+      "priority": 20
+    }
+  ]
+}

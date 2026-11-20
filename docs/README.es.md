@@ -15,6 +15,7 @@ Lee [el README del proyecto](../README.es.md) para conocer propósito, diferenci
 | Despliegue y configuración | [Deployment](ruffle.md) | [Despliegue](ruffle.es.md) |
 | Administración de salas y eventos | [Administration](events.md) | [Administración](events.es.md) |
 | Recursos históricos y procedencia | [Catalogue](event-catalogue.md) | [Catálogo](event-catalogue.es.md) |
+| Animaciones y poderes de eventos | [Special actions](special-actions.md) | [Acciones especiales](special-actions.es.md) |
 | Jugadores conectados | [Monitoring](online.md) | [Monitorización](online.es.md) |
 | Vanilla y Nieve | [Clients](vanilla.md) | [Clientes](vanilla.es.md) |
 | Actualizaciones, copias y recuperación | [Operations](redeploy.md) | [Operaciones](redeploy.es.md) |

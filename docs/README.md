@@ -15,6 +15,7 @@ Read [the project README](../README.md) for the project purpose, changes from up
 | Deployment and configuration | [Deployment](ruffle.md) | [Despliegue](ruffle.es.md) |
 | Room and event administration | [Administration](events.md) | [Administración](events.es.md) |
 | Historical resources and provenance | [Catalogue](event-catalogue.md) | [Catálogo](event-catalogue.es.md) |
+| Outfit animations and event powers | [Special actions](special-actions.md) | [Acciones especiales](special-actions.es.md) |
 | Online player monitoring | [Monitoring](online.md) | [Monitorización](online.es.md) |
 | Vanilla and Snow integration | [Clients](vanilla.md) | [Clientes](vanilla.es.md) |
 | Updates, backups and recovery | [Operations](redeploy.md) | [Operaciones](redeploy.es.md) |
