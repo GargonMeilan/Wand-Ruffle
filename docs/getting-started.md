@@ -9,8 +9,8 @@ Read [the project overview](../README.md) for what this fork adds and its compat
 ## Install
 
 ~~~sh
-git clone --recurse-submodules https://github.com/GargonMeilan/wand-fork.git
-cd wand-fork
+git clone --recurse-submodules https://github.com/GargonMeilan/wand-ruffle.git
+cd wand-ruffle
 ~~~
 
 Edit `.env` for your credentials and game/media URLs. Keep `LEGACY_PLAYER=ruffle` and `VANILLA_PLAYER=ruffle` for browser play.

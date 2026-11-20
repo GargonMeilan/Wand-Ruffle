@@ -6,7 +6,7 @@
 
 Esta página distingue cobertura automática, integración local registrada y verificación de cada despliegue. Un cargador, eco TCP o vista previa correctos no demuestran un evento completo.
 
-La integración base de la PR #1 superó los dos trabajos de GitHub Actions: validación general y build/arranque de backends. El [workflow registrado](https://github.com/GargonMeilan/wand-fork/actions/runs/43653518711) finalizó correctamente. El commit de documentación asociado era `dfd3bed`; las revisiones posteriores de documentación no son nuevas pruebas de compatibilidad.
+La integración base de la PR #1 superó los dos trabajos de GitHub Actions: validación general y build/arranque de backends. El [workflow registrado](https://github.com/GargonMeilan/wand-ruffle/actions/runs/43653518711) finalizó correctamente. El commit de documentación asociado era `dfd3bed`; las revisiones posteriores de documentación no son nuevas pruebas de compatibilidad.
 
 ## Cobertura automática
 

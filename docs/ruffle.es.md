@@ -16,8 +16,8 @@ Utiliza Compose v2 y valida la configuración. El YAML usa intervalos de inicio 
 ## Obtener las fuentes
 
 ~~~sh
-git clone --recurse-submodules https://github.com/GargonMeilan/wand-fork.git
-cd wand-fork
+git clone --recurse-submodules https://github.com/GargonMeilan/wand-ruffle.git
+cd wand-ruffle
 docker compose version
 ~~~
 

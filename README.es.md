@@ -1,4 +1,4 @@
-# Wand · Ruffle Edition
+# Wand Ruffle
 
 **Club Penguin Legacy y Vanilla en el navegador, con Docker Compose, Ruffle y un panel ampliado de administración.**
 
@@ -65,8 +65,8 @@ Python y Node.js se necesitan para desarrollo, no para iniciar los contenedores.
 ### Clonar y configurar
 
 ~~~sh
-git clone --recurse-submodules https://github.com/GargonMeilan/wand-fork.git
-cd wand-fork
+git clone --recurse-submodules https://github.com/GargonMeilan/wand-ruffle.git
+cd wand-ruffle
 ~~~
 
 En un checkout existente, ejecuta `git submodule update --init --recursive`. El `install.sh` heredado todavía clona `solero/wand`; utiliza estas instrucciones para instalar este fork.

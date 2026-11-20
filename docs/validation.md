@@ -6,7 +6,7 @@
 
 This page distinguishes automated coverage, previously recorded local integration and deployment-specific verification. A successful loader, TCP echo or preview does not establish a complete playable event.
 
-The baseline integration merged in PR #1 passed both GitHub Actions jobs: general validation and backend build/startup. The [recorded workflow](https://github.com/GargonMeilan/wand-fork/actions/runs/43653518711) completed successfully. Its associated documentation commit was `dfd3bed`; later documentation revisions do not represent a new game compatibility test.
+The baseline integration merged in PR #1 passed both GitHub Actions jobs: general validation and backend build/startup. The [recorded workflow](https://github.com/GargonMeilan/wand-ruffle/actions/runs/43653518711) completed successfully. Its associated documentation commit was `dfd3bed`; later documentation revisions do not represent a new game compatibility test.
 
 ## Automated coverage
 

@@ -9,8 +9,8 @@ Lee [la presentación](../README.es.md) para conocer aportaciones y límites. Ne
 ## Instalar
 
 ~~~sh
-git clone --recurse-submodules https://github.com/GargonMeilan/wand-fork.git
-cd wand-fork
+git clone --recurse-submodules https://github.com/GargonMeilan/wand-ruffle.git
+cd wand-ruffle
 ~~~
 
 Edita `.env` con credenciales y URLs. Mantén `LEGACY_PLAYER=ruffle` y `VANILLA_PLAYER=ruffle` para el navegador.
