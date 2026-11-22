@@ -10,6 +10,8 @@ jobs:
   sync:
     name: 'Submodules Sync'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     defaults:
       run:
@@ -29,7 +31,12 @@ jobs:
 
     - name: Commit update
       run: |
+        if git diff --cached --quiet; then
+          echo "No changes to commit"
+          exit 0
+        fi
+
         git config user.name 'github-actions[bot]'
         git config user.email 'github-actions[bot]@users.noreply.github.com'
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-        git commit -am "Fast-forward sub-modules" && git push || echo "No changes to commit"
+        git commit -m "Fast-forward sub-modules"
+        git push
